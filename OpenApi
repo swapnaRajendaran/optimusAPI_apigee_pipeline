@@ -1,0 +1,2512 @@
+openapi: 3.0.1
+info:
+  title: Learning management system API
+  description: API contains set of LMS endpoints which can be used by external clients as well for internal use.
+  version: 1.0.0
+servers:
+  - url: "https://api-dev.thomsonreuters.com/trlearning/v1"
+x-tr-proxy-name: Learning
+x-tr-asset-insight-id: "202209"
+x-tr-deploy-permissions:
+  - swapna.rajendaran@thomsonreuters.com
+x-tr-promote-permissions:
+  - dc-8Fzo0l4QslugUV7h2VEPqg
+x-tr-api-version: v1
+x-tr-cors-enabled: true
+x-tr-identity-provider: MachineToMachine
+x-tr-logging-provider:
+  - SumoLogic
+  - DataDog
+x-tr-apigee-base-path: /trlearning/v1
+x-tr-servers:
+  default:
+    environments:
+      dev:
+        host: lmc05olut3.execute-api.us-east-1.amazonaws.com
+        port: 443
+        ssl: "true"
+      test:
+        host: lmc05olut3.execute-api.us-east-1.amazonaws.com
+        port: 443
+        ssl: "true"
+      sat:
+        host: lmc05olut3.execute-api.us-east-1.amazonaws.com
+        port: 443
+        ssl: "true"
+    basePath: /green
+tags:
+  - name: user
+    description: LMS user
+  - name: course
+    description: LMS course
+  - name: enrollments
+    description: LMS enrollment
+  - name: branch
+    description: LMS branch
+  - name: catalogs
+    description: LMS catalogs
+paths:
+  /users:
+    get:
+      tags:
+        - user
+      summary: Finds the list of users
+      description: Fetches the list of users for which the logged in User has access. Various filter options available to fetch concentrated lists
+      operationId: GetUserList
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserList200Response"
+      security:
+        - OAuth2:
+            - "write:lms"
+            - "read:lms"
+    post:
+      tags:
+        - user
+      summary: Add a new user
+      operationId: addUser
+      requestBody:
+        description: New user object can be added within the branch that the logged in user has access to
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AddUserRequest"
+        required: true
+      responses:
+        "200":
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AddUserResponse"
+        "401":
+          description: Invalid credentials
+          content: {}
+        "403":
+          description: Permission denied
+          content: {}
+        "406":
+          description: Invalid input
+          content: {}
+      security:
+        - OAuth2:
+            - "write:lms"
+            - "read:lms"
+      x-codegen-request-body-name: body
+  "/users/{userId}":
+    get:
+      tags:
+        - user
+      summary: Find user by user id
+      description: Fetch user info based on user id provided. The logged in user must have access to branch where the requested user id resides
+      operationId: GetUser
+      parameters:
+        - name: userId
+          in: path
+          description: ID of user to return
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User200Response"
+        "404":
+          description: user not found
+          content: {}
+      security:
+        - OAuth2:
+            - "write:lms"
+            - "read:lms"
+    put:
+      tags:
+        - user
+      summary: Update user by user id
+      description: Update user info for the user id provided. The logged in user must have access to branch where the requested user id resides
+      operationId: UpdateUser
+      parameters:
+        - name: userId
+          in: path
+          description: ID of user to return
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        description: user object that needs to be added
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateUserRequest"
+        required: true
+      responses:
+        "200":
+          description: user updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdateUserResponse"
+        "404":
+          description: user not found
+          content: {}
+      security:
+        - OAuth2:
+            - "write:lms"
+            - "read:lms"
+      x-codegen-request-body-name: body
+    delete:
+      tags:
+        - user
+      summary: Delete user by user id
+      description: Delete existing user
+      operationId: DeleteUser
+      parameters:
+        - name: userId
+          in: path
+          description: ID of user to delete
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Delete Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Delete200Response"
+      security:
+        - OAuth2:
+            - "write:lms"
+            - "read:lms"
+  /courses:
+    get:
+      tags:
+        - course
+      summary: Finds the list of courses
+      description: Fetches the list of courses for which the logged in User has access
+      operationId: GetCourseList
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CourseGet200Response"
+      security:
+        - OAuth2:
+            - "write:lms"
+            - "read:lms"
+    post:
+      tags:
+        - course
+      summary: Add new course
+      description: New course can be added within the catalog that the logged in user has access to
+      operationId: CreateCourse
+      requestBody:
+        description: New course object can be added by the authorized user
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AddCourseRequest"
+          multipart/form-data:
+              schema:
+                $ref: "#/components/schemas/CourseMultipartPost"
+      responses:
+        "200":
+          description: created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AddCourseResponse"
+        "401":
+          description: Invalid credentials
+          content: {}
+        "403":
+          description: Permission denied
+          content: {}
+        "406":
+          description: not acceptable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InvalidParameterResponse"
+      security:
+        - OAuth2:
+            - "write:lms"
+            - "read:lms"
+  "/courses/{courseId}":
+    get:
+      tags:
+        - course
+      summary: Finds course by course id
+      description: Fetch course info based on course id provided. The logged in user must have access to catalog where the requested course id resides
+      operationId: GetCourseByCourseId
+      parameters:
+        - name: courseId
+          in: path
+          schema:
+            type: integer
+            format: int64
+          required: true
+      responses:
+        "200":
+          description: Auto generated using Swagger Inspector
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Course200Response"
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OptimusErrorResponse"
+      security:
+        - OAuth2:
+            - "write:lms"
+            - "read:lms"
+    delete:
+      tags:
+        - course
+      summary: deletes course by course id
+      description: Delete course info based on course id provided.
+      operationId: DeleteCourseByCourseId
+      parameters:
+        - name: courseId
+          in: path
+          schema:
+            type: integer
+            format: int64
+          required: true
+      responses:
+        "200":
+          description: Delete Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Delete200Response"
+        "500":
+          description: Auto generated using Swagger Inspector
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CourseDelete500Response"
+      security:
+        - OAuth2:
+            - "write:lms"
+            - "read:lms"
+    put:
+      parameters:
+        - name: courseId
+          in: path
+          schema:
+            type: integer
+            format: int64
+          required: true
+      tags:
+        - course
+      summary: update course by course id
+      description: Update course info for the course id provided. The logged in user must have access to the catalog where the requested course   id resides
+      operationId: UpdateCourseByCourseId
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CoursePut"
+          multipart/form-data:
+              schema:
+                $ref: "#/components/schemas/CourseMultipartPut"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdateCourseResponse"
+        "406":
+          $ref: "#/components/schemas/InvalidParameterResponse"
+      security:
+        - OAuth2:
+            - "write:lms"
+            - "read:lms"
+  /branches:
+    get:
+      tags:
+        - branch
+      summary: Finds the list of branches
+      description: Fetches the list of branches for which the logged in User has access
+      operationId: GetBranchList
+      responses:
+        "200":
+          description: Fetches the list of branches for which the logged in User has access
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/BranchesGet200Response"
+      security:
+        - OAuth2:
+            - "write:lms"
+            - "read:lms"
+  /catalogs:
+    get:
+      tags:
+        - catalogs
+      summary: Finds the list of catalogs
+      description: Fetches the list of catalogs for which the logged in User has access
+      operationId: GetCatalogList
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CatalogsGet200Response"
+      security:
+        - OAuth2:
+            - "write:lms"
+            - "read:lms"
+  "/enrollments/users/{userId}":
+    post:
+      tags:
+        - enrollments
+      summary: Sets user status for a particular course
+      description: Sets a course status for a given course id and user id
+      operationId: EnrollUser
+      parameters:
+        - name: userId
+          in: path
+          description: ID of user to enroll
+          schema:
+            type: integer
+            format: int64
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EnrollUserRequest"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EnrollmentPost200Response"
+
+        "406":
+          description: Not acceptable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InvalidParameterResponse"
+        "500":
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OptimusErrorResponse"
+      security:
+        - OAuth2:
+            - "write:lms"
+            - "read:lms"
+    put:
+      tags:
+        - enrollments
+      summary: Updates user status for a particular course
+      description: Updates a course status for a given course id and user id
+      operationId: UpdateEnrollUser
+      parameters:
+        - name: userId
+          in: path
+          description: ID of user to enroll
+          schema:
+            type: integer
+            format: int64
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EnrollUserRequest"
+      responses:
+        "200":
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EnrollmentPut200Response"
+        "406":
+          description: not acceptable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InvalidParameterResponse"
+      security:
+        - OAuth2:
+            - "write:lms"
+            - "read:lms"
+  "/courses/{courseId}/classroomsessions":
+    post:
+      tags:
+        - classroomsessions
+      summary: Adds a classroom session for a particular course
+      description: Adds a classroom session for a given course id
+      operationId: AddClassroomSession
+      parameters:
+        - name: courseId
+          in: path
+          schema:
+            type: integer
+            format: int64
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ClassroomSessionPost"
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClassroomSession200Response"
+        '406':
+          description: not acceptable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InvalidParameterResponse"
+      security:
+        - OAuth2:
+            - "write:lms"
+            - "read:lms"
+  "/courses/{courseId}/classroomsessions/{sessionId}":
+    delete:
+      tags:
+        - classroomsessions
+      summary: Deletes classroom session by session id
+      description: Delete classroom session info based on sessiond id provided.
+      operationId: DeleteClassroomSessionBySessionId
+      parameters:
+        - name: courseId
+          in: path
+          schema:
+            type: integer
+            format: int64
+          required: true
+        - name: sessionId
+          in: path
+          schema:
+            type: integer
+            format: int64
+          required: true
+      responses:
+        "200":
+          description: Delete Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Delete200Response"
+      security:
+        - OAuth2:
+            - "write:lms"
+            - "read:lms"
+  "/courses/{courseId}/webinarsessions":
+    post:
+      tags:
+        - webinarsessions
+      summary: Adds a webinar session for a particular course
+      description: Adds a webinar session for a given course id
+      operationId: AddWebinarSession
+      parameters:
+        - name: courseId
+          in: path
+          schema:
+            type: integer
+            format: int64
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WebinarSessionPost"
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WebinarSession200Response"
+        '406':
+          description: not acceptable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InvalidParameterResponse"
+      security:
+        - OAuth2:
+            - "write:lms"
+            - "read:lms"
+  "/courses/{courseId}/accreditation":
+      post:
+        tags:
+          - accreditation
+        summary: Adds an accreditation for a particular course
+        description: Adds an accreditation for a given course id
+        operationId: AddAccreditingCourse
+        parameters:
+          - name: courseId
+            in: path
+            schema:
+              type: integer
+              format: int64
+            required: true
+        requestBody:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccreditingCoursePost"
+        responses:
+          '200':
+            description: Success
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/AccreditingCoursePost200Response"
+          '406':
+            description: not acceptable
+            content:
+              application/json:
+                schema:
+                  $ref: "#/components/schemas/InvalidParameterResponse"
+        security:
+        - OAuth2:
+            - "write:lms"
+            - "read:lms"
+  /lp:
+    get:
+      tags:
+        - learningplan
+      summary: Finds the list of learning plans
+      description: Fetches the list of learning plans for which the logged in User has access
+      operationId: GetLearningPlanList
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/LearningPlanListGet200Response"
+      security:
+        - OAuth2:
+            - "write:lms"
+            - "read:lms"
+    post:
+      tags:
+        - learningplan
+      summary: Add new learning plan
+      description: New learning plan can be added within the catalog that the logged in user has access to
+      operationId: AddLearningPlan
+      requestBody:
+        description: New learning plan object can be added by the authorized user
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LearningPlanPost"
+          multipart/form-data:
+              schema:
+                $ref: "#/components/schemas/LearningPlanMultipartPost"
+      responses:
+        "200":
+          description: created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LearningPlanPost200Response"
+        "401":
+          description: Invalid credentials
+          content: {}
+        "403":
+          description: Permission denied
+          content: {}
+        "406":
+          description: not acceptable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InvalidParameterResponse"
+      security:
+        - OAuth2:
+            - "write:lms"
+            - "read:lms"  
+components:
+  schemas:
+    AddUserRequest:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+        username:
+          type: "string"
+        firstName:
+          type: "string"
+        lastName:
+          type: "string"
+        email:
+          type: "string"
+        password:
+          type: "string"
+        title:
+          type: "string"
+        office:
+          type: "string"
+        department:
+          type: "string"
+        city:
+          type: "string"
+        state:
+          type: "string"
+        country:
+          type: "string"
+        postalcode:
+          type: "string"
+        phonenumber:
+          type: "string"
+        hiredate:
+          type: "string"
+        branches:
+          type: "array"
+          items:
+            type: "object"
+            properties:
+              id:
+                type: "number"
+              code:
+                type: "string"
+              title:
+                type: "string"
+            required:
+              - "id"
+              - "code"
+              - "title"
+        instructor:
+          type: "boolean"
+        ismanager:
+          type: "boolean"
+        iscoach:
+          type: "boolean"
+        isexpired:
+          type: "boolean"
+        irsptin:
+          type: "string"
+        ctech:
+          type: "string"
+        cfp:
+          type: "string"
+        managername:
+          type: "string"
+        groupname:
+          type: "string"
+        timezone:
+          type: "string"
+        writeaccess:
+          type: "boolean"
+        level:
+          type: "string"
+          enum:
+            - "USER"
+            - "SUPER_ADMIN"
+            - "POWER_USER"
+      required:
+        - "username"
+        - "firstName"
+        - "lastName"
+        - "email"
+        - "password"
+        - "level"
+    UpdateUserRequest:
+      type: "object"
+      properties:
+        username:
+          type: "string"
+        firstName:
+          type: "string"
+        lastName:
+          type: "string"
+        email:
+          type: "string"
+        password:
+          type: "string"
+        title:
+          type: "string"
+        office:
+          type: "string"
+        department:
+          type: "string"
+        city:
+          type: "string"
+        state:
+          type: "string"
+        country:
+          type: "string"
+        postalcode:
+          type: "string"
+        phonenumber:
+          type: "string"
+        hiredate:
+          type: "string"
+        branches:
+          type: "array"
+          items:
+            type: "object"
+            properties:
+              id:
+                type: "number"
+              code:
+                type: "string"
+              title:
+                type: "string"
+            required:
+              - "id"
+              - "code"
+              - "title"
+        instructor:
+          type: "boolean"
+        ismanager:
+          type: "boolean"
+        iscoach:
+          type: "boolean"
+        isexpired:
+          type: "boolean"
+        irsptin:
+          type: "string"
+        ctech:
+          type: "string"
+        cfp:
+          type: "string"
+        managername:
+          type: "string"
+        groupname:
+          type: "string"
+        timezone:
+          type: "string"
+        writeaccess:
+          type: "boolean"
+        level:
+          type: "string"
+          enum:
+            - "USER"
+            - "SUPER_ADMIN"
+            - "POWER_USER"
+    AddCourseRequest:
+      type: "object"
+      properties:
+        catalogId:
+          type: "number"
+        courseType:
+          type: "string"
+          enum:
+            - "elearning"
+            - "webinar"
+            - "classroom"
+        courseCode:
+          type: "string"
+        courseTitle:
+          type: "string"
+        courseDescription:
+          type: "string"
+        courseObjectives:
+          type: "string"
+        courseCategory:
+          type: "number"
+        courseNavigationPolicy:
+          type: "number"
+        selfUnenrollment:
+          type: "number"
+        maximumNumberOfAttempts:
+          type: "number"
+        showCourse:
+          type: "number"
+        maxSubscriptionQuota:
+          type: "number"
+        waitingList:
+          type: "number"
+        demoMaterial:
+          type: "string"
+        courseSubscription:
+          type: "number"
+        enrollmentPolicy:
+          type: "number"
+        startDate:
+          type: "string"
+        endDate:
+          type: "string"
+        numberOfDaysValid:
+          type: "number"
+        validity:
+          type: "number"
+        courseAutoPlay:
+          type: "number"
+        courseInitialScoreCalculation:
+          type: "number"
+        courseFinalScoreCalculation:
+          type: "number"
+        prerequisitesList:
+          type: "string"
+        advancedPreparations:
+          type: "string"
+        targetAudience:
+          type: "string"
+        majorTopics:
+          type: "string"
+        level:
+          type: "string"
+          enum:
+            - "BASIC"
+            - "INTERMEDIATE"
+            - "ADVANCED"
+            - "OVERVIEW"
+            - "UPDATE"
+        price:
+          type: "number"
+        onSale:
+          type: "boolean"
+        isPublished:
+          type: "boolean"
+        instructors:
+          type: "array"
+          items:
+            type: "object"
+            properties:
+              avatar_url:
+                type: "string"
+              firstname:
+                type: "string"
+              instructor_id:
+                type: "number"
+              lastname:
+                type: "string"
+              username:
+                type: "string"
+            required:
+              - "avatar_url"
+              - "firstname"
+              - "instructor_id"
+              - "lastname"
+              - "username"
+        sessionList:
+          type: "array"
+          items:
+            type: "object"
+            properties:
+              dates:
+                type: "array"
+                items:
+                  type: "object"
+                  properties:
+                    date:
+                      type: "string"
+                    end_hour:
+                      type: "string"
+                    gmt:
+                      type: "string"
+                    name:
+                      type: "string"
+                    start_hour:
+                      type: "string"
+                    timezone:
+                      type: "string"
+                  required:
+                    - "date"
+                    - "name"
+                    - "timezone"
+              end_date:
+                type: "string"
+              id_session:
+                type: "number"
+              locations:
+                type: "array"
+                items:
+                  type: "object"
+                  properties:
+                    accommodation:
+                      type: "string"
+                    address:
+                      type: "string"
+                    email:
+                      type: "string"
+                    id_country:
+                      type: "number"
+                    id_location:
+                      type: "number"
+                    id_zone:
+                      type: "number"
+                    iso_code_country:
+                      type: "string"
+                    name:
+                      type: "string"
+                    name_country:
+                      type: "string"
+                    other_info:
+                      type: "string"
+                    reaching_info:
+                      type: "string"
+                    telephone:
+                      type: "string"
+                  required:
+                    - "id_location"
+                    - "name"
+                    - "name_country"
+              name:
+                type: "string"
+              start_date:
+                type: "string"
+            required:
+              - "dates"
+              - "end_date"
+              - "id_session"
+              - "name"
+              - "start_date"
+      required:
+        - "catalogId"
+        - "courseType"
+        - "courseTitle"
+        - "courseDescription"
+    UpdateCourseRequest:
+      type: "object"
+      properties:
+        catalogId:
+          type: "number"
+        courseType:
+          type: "string"
+          enum:
+            - "elearning"
+            - "webinar"
+            - "classroom"
+        courseCode:
+          type: "string"
+        courseTitle:
+          type: "string"
+        courseDescription:
+          type: "string"
+        courseObjectives:
+          type: "string"
+        courseCategory:
+          type: "number"
+        courseNavigationPolicy:
+          type: "number"
+        selfUnenrollment:
+          type: "number"
+        maximumNumberOfAttempts:
+          type: "number"
+        showCourse:
+          type: "number"
+        maxSubscriptionQuota:
+          type: "number"
+        waitingList:
+          type: "number"
+        demoMaterial:
+          type: "string"
+        courseSubscription:
+          type: "number"
+        enrollmentPolicy:
+          type: "number"
+        startDate:
+          type: "string"
+        endDate:
+          type: "string"
+        numberOfDaysValid:
+          type: "number"
+        validity:
+          type: "number"
+        courseAutoPlay:
+          type: "number"
+        courseInitialScoreCalculation:
+          type: "number"
+        courseFinalScoreCalculation:
+          type: "number"
+        prerequisitesList:
+          type: "string"
+        advancedPreparations:
+          type: "string"
+        targetAudience:
+          type: "string"
+        majorTopics:
+          type: "string"
+        level:
+          type: "string"
+          enum:
+            - "BASIC"
+            - "INTERMEDIATE"
+            - "ADVANCED"
+            - "OVERVIEW"
+            - "UPDATE"
+        price:
+          type: "number"
+        onSale:
+          type: "boolean"
+        isPublished:
+          type: "boolean"
+        instructors:
+          type: "array"
+          items:
+            type: "object"
+            properties:
+              avatar_url:
+                type: "string"
+              firstname:
+                type: "string"
+              instructor_id:
+                type: "number"
+              lastname:
+                type: "string"
+              username:
+                type: "string"
+            required:
+              - "avatar_url"
+              - "firstname"
+              - "instructor_id"
+              - "lastname"
+              - "username"
+        sessionList:
+          type: "array"
+          items:
+            type: "object"
+            properties:
+              dates:
+                type: "array"
+                items:
+                  type: "object"
+                  properties:
+                    date:
+                      type: "string"
+                    end_hour:
+                      type: "string"
+                    gmt:
+                      type: "string"
+                    name:
+                      type: "string"
+                    start_hour:
+                      type: "string"
+                    timezone:
+                      type: "string"
+                  required:
+                    - "date"
+                    - "name"
+                    - "timezone"
+              end_date:
+                type: "string"
+              id_session:
+                type: "number"
+              locations:
+                type: "array"
+                items:
+                  type: "object"
+                  properties:
+                    accommodation:
+                      type: "string"
+                    address:
+                      type: "string"
+                    email:
+                      type: "string"
+                    id_country:
+                      type: "number"
+                    id_location:
+                      type: "number"
+                    id_zone:
+                      type: "number"
+                    iso_code_country:
+                      type: "string"
+                    name:
+                      type: "string"
+                    name_country:
+                      type: "string"
+                    other_info:
+                      type: "string"
+                    reaching_info:
+                      type: "string"
+                    telephone:
+                      type: "string"
+                  required:
+                    - "id_location"
+                    - "name"
+                    - "name_country"
+              name:
+                type: "string"
+              start_date:
+                type: "string"
+            required:
+              - "dates"
+              - "end_date"
+              - "id_session"
+              - "name"
+              - "start_date"
+    CourseMultipartPost:
+      type: object
+      properties:
+        body:
+          $ref: "#/components/schemas/AddCourseRequest"
+        image:
+          type: string
+          format: binary
+    CourseMultipartPut:
+      type: object
+      properties:
+        body:
+          $ref: "#/components/schemas/CoursePut"
+        image:
+          type: string
+          format: binary
+    EnrollmentPut:
+      type: object
+      properties:
+        courseId:
+          type: integer
+        enrollmentStatus:
+          type: string
+    EnrollmentPost:
+      type: object
+      properties:
+        courseIds:
+          type: array
+          items:
+            type: integer
+        level:
+          type: string
+        userIds:
+          type: array
+          items:
+            type: integer
+        sessionId:
+          type: integer
+    AddUserResponse:
+      type: "object"
+      properties:
+        body:
+          type: "object"
+          properties:
+            id:
+              type: "string"
+            message:
+              type: "string"
+        correlationId:
+          type: "string"
+        statusCode:
+          type: "integer"
+        success:
+          type: "boolean"
+    UpdateUserResponse:
+      type: "object"
+      properties:
+        body:
+          type: "object"
+          properties:
+            message:
+              type: "string"
+        correlationId:
+          type: "string"
+        statusCode:
+          type: "integer"
+        success:
+          type: "boolean"
+    AddCourseResponse:
+      type: "object"
+      properties:
+        body:
+          type: "object"
+          properties:
+            id:
+              type: "string"
+            message:
+              type: "string"
+        correlationId:
+          type: "string"
+        statusCode:
+          type: "integer"
+        success:
+          type: "boolean"
+    UpdateCourseResponse:
+      type: "object"
+      properties:
+        body:
+          type: "object"
+          properties:
+            message:
+              type: "string"
+        correlationId:
+          type: "string"
+        statusCode:
+          type: "integer"
+        success:
+          type: "boolean"
+    Delete200Response:
+      type: object
+      properties:
+        success:
+          type: boolean
+        correlationId:
+          type: string
+        body:
+          type: object
+          properties:
+            success:
+              type: boolean
+            message:
+              type: string
+        statusCode:
+          type: integer
+    UserPut:
+      type: object
+      properties:
+        lastName:
+          type: string
+        country:
+          type: string
+        ismanager:
+          type: boolean
+        hiredate:
+          type: string
+        city:
+          type: string
+        timezone:
+          type: string
+        phonenumber:
+          type: string
+        office:
+          type: string
+        title:
+          type: string
+        ctech:
+          type: string
+        password:
+          type: string
+        isexpired:
+          type: boolean
+        postalcode:
+          type: string
+        writeaccess:
+          type: boolean
+        managername:
+          type: string
+        id:
+          type: string
+        state:
+          type: string
+        department:
+          type: string
+        email:
+          type: string
+        iscoach:
+          type: boolean
+        level:
+          type: string
+          enum:
+            - USER
+            - SUPER_ADMIN
+            - POWER_USER
+        irsptin:
+          type: string
+        cfp:
+          type: string
+        branches:
+          type: array
+          items:
+            type: object
+            properties:
+              code:
+                type: string
+              id:
+                type: integer
+              title:
+                type: string
+        groupname:
+          type: string
+        firstName:
+          type: string
+        instructor:
+          type: boolean
+        username:
+          type: string
+      required:
+        - username
+        - password
+        - firstName
+        - lastName
+        - email
+    UserPost:
+      type: object
+      properties:
+        lastName:
+          type: string
+        country:
+          type: string
+        ismanager:
+          type: boolean
+        hiredate:
+          type: string
+        city:
+          type: string
+        timezone:
+          type: string
+        phonenumber:
+          type: string
+        office:
+          type: string
+        title:
+          type: string
+        ctech:
+          type: string
+        password:
+          type: string
+        isexpired:
+          type: boolean
+        postalcode:
+          type: string
+        writeaccess:
+          type: boolean
+        managername:
+          type: string
+        state:
+          type: string
+        department:
+          type: string
+        email:
+          type: string
+        iscoach:
+          type: boolean
+        level:
+          type: string
+          enum:
+            - USER
+            - SUPER_ADMIN
+            - POWER_USER
+        irsptin:
+          type: string
+        cfp:
+          type: string
+        branches:
+          type: array
+          items:
+            type: object
+            properties:
+              code:
+                type: string
+              id:
+                type: integer
+              title:
+                type: string
+            required:
+              - code
+              - id
+              - title
+        groupname:
+          type: string
+        firstName:
+          type: string
+        instructor:
+          type: boolean
+        username:
+          type: string
+      required:
+        - username
+        - password
+        - firstName
+        - lastName
+        - email
+        - level
+      xml:
+        name: User
+    CourseGet200Response:
+      type: object
+      properties:
+        id:
+          type: string
+        internalid:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        objective:
+          type: string
+        comment:
+          type: string
+        prerequisiteslist:
+          type: string
+        location:
+          type: string
+        level:
+          type: string
+        totalcredithours:
+          type: string
+        credithours:
+          type: string
+        startdate:
+          type: string
+        enddate:
+          type: string
+        timezone:
+          type: string
+        duration:
+          type: string
+        deliverytype:
+          type: string
+        provider:
+          type: string
+        price:
+          type: string
+        catalogid:
+          type: string
+        catalogname:
+          type: string
+        catalogitemid:
+          type: string
+        directlink:
+          type: string
+        instructoruserid:
+          type: string
+        instructorfirstname:
+          type: string
+        instructorlastname:
+          type: string
+        instructordesignation:
+          type: string
+        instructorentity:
+          type: string
+        instructorbio:
+          type: string
+        instructornotes:
+          type: string
+        instructorpicture:
+          type: string
+        isdisabled:
+          type: boolean
+      xml:
+        name: Course
+    CourseDelete500Response:
+      type: object
+      properties:
+        success:
+          type: boolean
+        errorCode:
+          type: string
+        correlationId:
+          type: string
+        body:
+          type: object
+          properties:
+            exception:
+              type: string
+            path:
+              type: string
+            error:
+              type: string
+            message:
+              type: string
+            timestamp:
+              type: number
+            status:
+              type: integer
+        statusCode:
+          type: integer
+    BranchesGet200Response:
+      type: object
+      properties:
+        success:
+          type: boolean
+        correlationId:
+          type: string
+        body:
+          type: array
+          items:
+            type: object
+            properties:
+              code:
+                type: string
+              level:
+                type: integer
+              hasChildren:
+                type: boolean
+              id:
+                type: integer
+              title:
+                type: string
+        statusCode:
+          type: integer
+    UserResponseBody:
+      type: object
+      properties:
+        Office:
+          type: string
+        lastName:
+          type: string
+        Professional Level:
+          type: string
+        Account Number:
+          type: string
+        Firm ID:
+          type: string
+        Hire Date:
+          type: string
+        Employee / Contractor ID:
+          type: string
+        uuid:
+          type: string
+        valid:
+          type: string
+        Special Dietary Requirements:
+          type: string
+        Department:
+          type: string
+        Billing City:
+          type: string
+        Billing Address:
+          type: string
+        Team:
+          type: string
+        id:
+          type: string
+        Billing State / Province:
+          type: string
+        "IRS PTIN (e.g., P12345678)":
+          type: string
+        Internal Custom:
+          type: string
+        email:
+          type: string
+        "CTEC No. (e.g., A123456)":
+          type: string
+        Notes:
+          type: string
+        Accreditation & Compliance Edit Rights:
+          type: string
+        Rehire Date:
+          type: string
+        Designation:
+          type: string
+        TRID User:
+          type: string
+        OnvioUK Products:
+          type: string
+        Additional Sponsors:
+          type: string
+        level:
+          type: string
+        Position:
+          type: string
+        Referred By:
+          type: string
+        "CFP No. (e.g., 12345)":
+          type: string
+        Company / Organisation Name:
+          type: string
+        Billing Country:
+          type: string
+        branches:
+          type: array
+          items:
+            type: object
+            properties:
+              code:
+                type: string
+              level:
+                type: integer
+              hasChildren:
+                type: boolean
+              id:
+                type: integer
+              title:
+                type: string
+        Product Family:
+          type: string
+        Industry / Practice Group:
+          type: string
+        Termination Date:
+          type: string
+        firstName:
+          type: string
+        Billing Postal Code:
+          type: string
+        TaxPro Products:
+          type: string
+        Managed By:
+          type: string
+        Phone Number:
+          type: string
+        username:
+          type: string
+        Company Type:
+          type: string
+        Location:
+          type: string
+    User200Response:
+      type: object
+      properties:
+        success:
+          type: boolean
+        correlationId:
+          type: string
+        body:
+          $ref: "#/components/schemas/UserResponseBody"
+        statusCode:
+          type: integer
+    UserList200Response:
+      type: object
+      properties:
+        success:
+          type: boolean
+        correlationId:
+          type: string
+        body:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserResponseBody"
+        statusCode:
+          type: integer
+    CatalogsGet200Response:
+      type: object
+      properties:
+        success:
+          type: boolean
+        correlationId:
+          type: string
+        body:
+          type: array
+          items:
+            type: object
+            properties:
+              courses:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    sessionDurationInMinutes:
+                      type: string
+                    courseType:
+                      type: string
+                    thumbnail:
+                      type: string
+                    sessionStart:
+                      type: string
+                    courseCode:
+                      type: string
+                    sessionName:
+                      type: string
+                    sessionEnd:
+                      type: string
+                    slugName:
+                      type: string
+                    sessionId:
+                      type: string
+                    dateSessionTimezone:
+                      type: string
+                    courseDescription:
+                      type: string
+                    sessionTimezone:
+                      type: string
+                    contentPartnerId:
+                      type: string
+                    courseTitle:
+                      type: string
+                    duration:
+                      type: string
+                    price:
+                      type: integer
+                    courseId:
+                      type: integer
+              name:
+                type: string
+              description:
+                type: string
+              id:
+                type: integer
+        statusCode:
+          type: integer
+    CoursePost:
+      type: object
+      properties:
+        selfUnenrollment:
+          type: integer
+        courseType:
+          type: string
+        startDate:
+          type: string
+        endDate:
+          type: string
+        courseCode:
+          type: string
+        courseAutoPlay:
+          type: integer
+        courseCategory:
+          type: integer
+        courseTitle:
+          type: string
+        dayOfValidity:
+          type: integer
+        catalogId:
+          type: integer
+        demoMaterial:
+          type: string
+        advancedPreparations:
+          type: string
+        enrollmentPolicy:
+          type: integer
+        price:
+          type: integer
+        onSale:
+          type: boolean
+        showCourse:
+          type: integer
+        courseFinalScoreCalculation:
+          type: integer
+        prerequisitesList:
+          type: string
+        waitingList:
+          type: integer
+        level:
+          type: string
+        isPublished:
+          type: boolean
+        majorTopics:
+          type: string
+        maxSubscriptionQuota:
+          type: integer
+        courseDescription:
+          type: string
+        maximumNumberOfAttempts:
+          type: integer
+        targetAudience:
+          type: string
+        courseNavigationPolicy:
+          type: integer
+        validity:
+          type: integer
+        courseInitialScoreCalculation:
+          type: integer
+        courseObjective:
+          type: string
+        courseSubscription:
+          type: integer
+      required:
+        - catalogId
+        - courseType
+        - courseDescription
+        - courseTitle
+    CoursePut:
+      type: object
+      properties:
+        selfUnenrollment:
+          type: integer
+        courseType:
+          type: string
+        prerequisitesList:
+          type: string
+        waitingList:
+          type: integer
+        startDate:
+          type: string
+        endDate:
+          type: string
+        level:
+          type: string
+        isPublished:
+          type: boolean
+        courseCode:
+          type: string
+        majorTopics:
+          type: string
+        courseObjectives:
+          type: string
+        courseAutoPlay:
+          type: integer
+        courseDescription:
+          type: string
+        courseCategory:
+          type: integer
+        courseTitle:
+          type: string
+        demoMaterial:
+          type: string
+        advancedPreparation:
+          type: string
+        targetAudience:
+          type: string
+        enrollmentPolicy:
+          type: integer
+        price:
+          type: integer
+        onSale:
+          type: boolean
+    Course200Response:
+      type: object
+      properties:
+        success:
+          type: boolean
+        correlationId:
+          type: string
+        body:
+          type: object
+          properties:
+            selfUnenrollment:
+              type: integer
+            courseType:
+              type: string
+            endDate:
+              type: string
+            Course Objectives:
+              type: string
+            courseCode:
+              type: string
+            courseAutoPlay:
+              type: integer
+            Major Topics:
+              type: string
+            courseCategory:
+              type: integer
+            courseTitle:
+              type: string
+            Prerequisites:
+              type: string
+            Program Format:
+              type: string
+            catalogId:
+              type: integer
+            demoMaterial:
+              type: string
+            image:
+              type: string
+            enrollmentPolicy:
+              type: integer
+            price:
+              type: integer
+            Target Audience:
+              type: string
+            onSale:
+              type: boolean
+            id:
+              type: integer
+            waitingList:
+              type: integer
+            isPublished:
+              type: boolean
+            courseDescription:
+              type: string
+            Advanced Preparation:
+              type: string
+            Program Level:
+              type: string
+            startDate:
+              type: string
+        statusCode:
+          type: integer
+    EnrollmentPut200Response:
+      type: object
+      properties:
+        success:
+          type: boolean
+        correlationId:
+          type: string
+        body:
+          type: object
+          properties:
+            sessions:
+              type: array
+              items:
+                type: object
+                properties:
+                  date_begin:
+                    type: string
+                    description: "The UTC begin date of the session, in the &quot;yyyy-mm-dd hh:mm:ss&quot; format"
+                  date_end:
+                    type: string
+                    description: "The UTC end date of the session, in the &quot;yyyy-mm-dd hh:mm:ss&quot; format"
+                  dates:
+                    type: array
+                    description: A list of session dates
+                    items:
+                      type: object
+                      properties:
+                        attendance_status:
+                          type: string
+                          example: "null"
+                          description: The attendance status of the user for the session date
+                          enum:
+                            - attended
+                            - not_attended
+                        date:
+                          type: string
+                          example: "null"
+                          description: The session date
+                        id_classroom:
+                          type: integer
+                          format: int32
+                          example: "null"
+                          description: "The ID of the classroom where the course is located, for classrooms only"
+                        id_location:
+                          type: integer
+                          format: int32
+                          example: "null"
+                          description: "The ID of the location where the course is located, for classrooms only"
+                        name:
+                          type: string
+                          example: "null"
+                          description: The name of the session date
+                        time_begin:
+                          type: string
+                          example: "null"
+                          description: The starting time of the session date
+                        time_end:
+                          type: string
+                          example: "null"
+                          description: The ending time of the session date
+                        timezone:
+                          type: string
+                          example: "null"
+                          description: The timezone of the session date
+                  description:
+                    type: string
+                    description: The description of the session
+                  id:
+                    type: integer
+                    format: int32
+                    description: The id of the session
+                  max_enrollments:
+                    type: integer
+                    format: int32
+                    description: Maximum number of allowed enrollments
+                  min_enrollments:
+                    type: integer
+                    format: int32
+                    description: "Minimum number of allowed enrollments, only for classrooms"
+                  name:
+                    type: string
+                    description: The name of the session
+                  other_info:
+                    type: string
+                    description: Additional info about the course. Only for classrooms
+                  score_base:
+                    type: integer
+                    format: int32
+                    description: The base score of the course
+                  status:
+                    type: string
+                    description: The status of the user enrollment for the session
+                    enum:
+                      - not_subscribed
+                      - subscribed
+                      - in_progress
+                      - complete
+                      - waiting
+                      - subscription_to_confirm
+                      - overbooking
+                  tool:
+                    type: string
+                    description: The name of the tool used for the webinar. For webinars only.
+            code:
+              type: string
+            courseId:
+              type: integer
+            endDate:
+              type: string
+            level:
+              type: string
+            enrollmentFields:
+              type: object
+              properties:
+                Accreditation Info:
+                  type: string
+            description:
+              type: string
+            sessionId:
+              type: integer
+            type:
+              type: string
+            enrollDate:
+              type: string
+            userId:
+              type: integer
+            score:
+              type: integer
+            enrollmentURL:
+              type: string
+            enrollmentStatus:
+              type: string
+            name:
+              type: string
+            completionDate:
+              type: string
+        statusCode:
+          type: integer
+    EnrollmentPost200Response:
+      type: object
+      properties:
+        success:
+          type: boolean
+        correlationId:
+          type: string
+        body:
+          type: object
+          properties:
+            enrolled:
+              type: string
+            errors:
+              type: string
+        statusCode:
+          type: integer
+    ClassroomSessionPost:
+      type: object
+      properties:
+        code:
+          type: string
+        lastSubscriptionDate:
+          type: string
+        minimumEnrollments:
+          type: integer
+        sessionName:
+          type: string
+        maximumEnrollments:
+          type: integer
+        dates:
+          type: array
+          items:
+            type: object
+            properties:
+              timeEnd:
+                type: string
+              timeBegin:
+                type: string
+              sessionDayName:
+                type: string
+              timezone:
+                type: string
+              locationId:
+                type: integer
+              breakEnd:
+                type: string
+              classroomId:
+                type: integer
+              breakBegin:
+                type: string
+              day:
+                type: string
+      required:
+        - sessionName
+        - maximumEnrollments
+        - day
+        - timeBegin
+        - timeEnd
+        - locationId
+    ClassroomSession200Response:
+      type: object
+      properties:
+        success:
+          type: boolean
+        correlationId:
+          type: string
+        body:
+          type: object
+          properties:
+            message:
+              type: string
+        statusCode:
+          type: integer
+    WebinarSessionPost:
+      type: object
+      properties:
+        completion:
+          type: string
+        code:
+          type: string
+        record_accessed:
+          type: boolean
+        name:
+          type: string
+        description:
+          type: string
+        dates:
+          type: array
+          items:
+            type: object
+            properties:
+              webinartool:
+                type: string
+              timezone:
+                type: string
+              time_begin:
+                type: string
+              description:
+                type: string
+              url:
+                type: string
+              instructorjoin:
+                type: string
+              learnerjoin:
+                type: string
+              break_begin:
+                type: string
+              name:
+                type: string
+              oauthaccount:
+                type: string
+              time_end:
+                type: string
+              day:
+                type: string
+              break_end:
+                type: string
+        max_enroll:
+          type: integer
+        min_session:
+          type: integer
+      required:
+        - name
+        - max_enroll
+        - day
+        - sessionDateDuration    
+    WebinarSession200Response:
+      type: object
+      properties:
+        success:
+          type: boolean
+        correlationId:
+          type: string
+        body:
+          type: object
+          properties:
+            message:
+              type: string
+        statusCode:
+          type: integer
+    OptimusErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        errorCode:
+          type: string
+        correlationId:
+          type: string
+        body:
+          type: object
+          properties:
+            exception:
+              type: string
+            path:
+              type: string
+            error:
+              type: string
+            message:
+              type: string
+            timestamp:
+              type: number
+            status:
+              type: integer
+        statusCode:
+          type: integer
+    InvalidParameterResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        correlationId:
+          type: string
+        body:
+          type: object
+          properties:
+            invalidParameters:
+              type: array
+              items:
+                type: object
+                properties:
+                  reason:
+                    type: string
+                  requiredType:
+                    type: string
+                  parameter:
+                    type: string
+        statusCode:
+          type: integer
+    Tag:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+      xml:
+        name: Tag
+    ApiResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+        type:
+          type: string
+        message:
+          type: string
+    LearningPlanPost:
+      type: object
+      properties:
+        learningPlanName:
+          type: string
+        learningPlanDescription:
+          type: string
+        learningPlanCode:
+          type: string
+        addToCourseCatalog:
+          type: boolean
+        dayOfValidity:
+          type: string
+        image:
+          type: string
+        channels:
+          type: string
+        certificate:
+          type: string
+        certificationAndRetraining:
+          type: string
+        enrollmentEnabled:
+          type: boolean
+      required:
+        - learningPlanName
+        - learningPlanDescription
+    LearningPlanPost200Response:
+      type: "object"
+      properties:
+        learningPlanName:
+          type: "string"
+        learningPlanDescription:
+          type: "string"
+        learningPlanCode:
+          type: "string"
+        addToCourseCatalog:
+          type: "boolean"
+        dayOfValidity:
+          type: "string"
+        image:
+          type: "string"
+        channels:
+          type: "string"
+        certificate:
+          type: "string"
+        certificationAndRetraining:
+          type: "string"
+        enrollmentEnabled:
+          type: "boolean"
+      required:
+        - "learningPlanName"
+        - "learningPlanDescription"
+    LearningPlanMultipartPost:
+      type: object
+      properties:
+        body:
+          $ref: "#/components/schemas/LearningPlanPost"
+        image:
+          type: string
+          format: binary
+    
+    LearningPlanListGet200Response:
+      type: "object"
+      properties:
+        success:
+          type: boolean
+        correlationId:
+          type: string
+        body:
+          type: array
+          items:
+            type: object
+            properties:
+              learningPlanId:
+                type: string
+              learningPlanAccessLevel:
+                type: string
+              learningPlanName:
+                type: string
+        statusCode:
+          type: integer
+    AccreditingCoursePost:
+      type: object
+      properties:
+        courseDeliveryFormat:
+          type: string
+        sponsor:
+          type: object
+          properties:
+            sponsorId:
+              type: string
+            sponsorName:
+              type: string 
+            sponsorIdNo:
+              type: integer
+        regulators:
+          type: array
+          items:
+            type: object
+            properties:
+              regulatorId:
+                type: string
+              regulatorName:
+                type: string
+        fieldsofStudy:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+              duration:
+                type: integer
+        questionnaire:
+          type: array
+          items:
+            type: object
+            properties:
+              qId:
+                type: string
+              aId:
+                type: string
+              aTxt:
+                type: string
+      required:
+        - courseDeliveryFormat
+        - sponsor
+        - regulators
+        - sessionDateDuration    
+        - fieldsofStudy
+        - questionnaire  
+    AccreditingCoursePost200Response:
+      type: "object"
+      properties:
+        courseDeliveryFormat:
+          type: "string"
+          enum:
+            - "Blended Learning (Group)"
+            - "Blended Learning (Self-Study)"
+            - "Group Internet Based (Recorded)"
+            - "Group Internet Based (Webinar)"
+            - "Group Live (Classroom)"
+            - "Nano-Learning"
+            - "Self-Study Interactive"
+            - "Self-Study Non-Interactive"
+        sponsor:
+          type: "object"
+          properties:
+            sponsorId:
+              type: "string"
+            sponsorName:
+              type: "string"
+            sponsorIdNo:
+              type: "number"
+          required:
+            - "sponsorId"
+            - "sponsorName"
+            - "sponsorIdNo"
+        regulators:
+          type: "array"
+          items:
+            type: "object"
+            properties:
+              regulatorName:
+                type: "string"
+                enum:
+                  - "Standard Regulators and NASBA"
+                  - "California Registered Tax Preparer (CTEC)"
+                  - "Certified Financial Planner (CFP)"
+                  - "IRS (Enrolled Agent/Non-Credentialed Return Preparer)"
+              regulatorId:
+                type: "string"
+            required:
+              - "regulatorName"
+              - "regulatorId"
+        fieldsofStudy:
+          type: "array"
+          items:
+            type: "object"
+            properties:
+              id:
+                type: "string"
+              name:
+                type: "string"
+                enum:
+                  - "Accounting"
+                  - "Accounting (Govt.)"
+                  - "Auditing"
+                  - "Auditing (Govt)"
+                  - "Behavioral Ethics"
+                  - "Business Law"
+                  - "Business Management and Organization"
+                  - "Business Valuation"
+                  - "Communications and Marketing"
+                  - "Computer Software and Applications"
+                  - "Economics"
+                  - "Employee Benefits"
+                  - "Finance"
+                  - "Fraud"
+                  - "Information Technology"
+                  - "Management Services"
+                  - "Personal Development"
+                  - "Personnel/Human Resources"
+                  - "Production"
+                  - "Regulatory Ethics"
+                  - "Specialized Knowledge"
+                  - "Statistics"
+                  - "Taxes"
+              duration:
+                type: "number"
+            required:
+              - "id"
+              - "name"
+              - "duration"
+        questionnaire:
+          type: "array"
+          items:
+            type: "object"
+            properties:
+              qId:
+                type: "string"
+              aId:
+                type: "string"
+              aTxt:
+                type: "string"
+            required:
+              - "qId"
+              - "aId"
+              - "aTxt"
+      required:
+        - "courseDeliveryFormat"
+        - "sponsor"
+        - "regulators"
+        - "fieldsofStudy"
+        - "questionnaire"
+  securitySchemes:
+    OAuth2:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: "https://api-dev.thomsonreuters.com/tr-oauth/v1/token"
+          scopes:
+            "write:lms": modify lms in your account
+            "read:lms": read your lms
