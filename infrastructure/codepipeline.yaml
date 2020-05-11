@@ -1,1 +1,42 @@
-
+AWSTemplateFormatVersion: "2020-05-11"
+Description: CloudFormation Template to manage our CI/CD Pipeline
+Parameters:
+  AssetInsightId:
+    Type: String
+    Description: The asset insight id to tag our resources with
+  ResourceOwner:
+    Type: String
+    Description: Who to contact about the resource
+Resources:
+  KMS:
+    Type: AWS::KMS::Key
+    Properties:
+      Description: "KMS Key to access our secrets manager"
+      Enabled: True
+      EnableKeyRotation: False
+      KeyPolicy:
+        Version: "2020-05-11"
+        Id: "a202209-CodePipeline-Tutorial-Secrets-Manager-KMS"
+        Statement:
+        - Sid: Enable IAM User Permissions for our PowerUser
+          Effect: Allow
+          Principal:
+            # This is giving permission to our PowerUser2 account, allowing us to view the secrets through the console or cli
+            AWS: !Sub "arn:aws:iam::${AWS::AccountId}:role/human-role/a${AssetInsightId}-PowerUser2"
+          Action: "kms:*"
+          Resource: "*"
+        - Sid: Enable IAM User Permissions for our CodePipeline
+          Effect: Allow
+          Principal:
+            # This is giving permission to the CICD role managed by CCoE. This is the role our pipeline will assume.
+            AWS: !Sub "arn:aws:iam::${AWS::AccountId}:role/service-role/a${AssetInsightId}-CICD-Deployment"
+          Action: "kms:*"
+          Resource: "*"
+  Secrets:
+    Type: AWS::SecretsManager::Secret
+    DependsOn:
+      - KMS
+    Properties:
+      Description: "CodePipeline Tutorial Secrets Manager"
+      KmsKeyId: !GetAtt KMS.Arn
+      Name: "a202209-codepipeline-tutorial-secrets-manager/secrets"
