@@ -16,5 +16,5 @@ phases:
       - echo registry = https://tr1.jfrog.io/tr1/api/npm/npm/ >> ~/.npmrc
       - echo always-auth = true >> ~/.npmrc
       - echo email = swapna.rajendaran@thomsonreuters.com >> ~/.npmrc
-      - npm install tr-apigee-integration-tool
+      - npm install -g tr-apigee-integration-tool
       - apigee-integration-tool generateApi -s ./OpenApi.yaml -o tr-api-cloud-qa -v secure -e dev
