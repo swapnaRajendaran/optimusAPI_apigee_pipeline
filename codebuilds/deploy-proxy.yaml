@@ -4,8 +4,8 @@ env:
     # use the name of your secrets manager in the codepipline.yaml
     # For example a206504-codepipeline-tutorial-secrets-manager/secrets
     ARTIFACTORY_REGISTRY_AUTH: AKCp5emRN3NkHArYfHPweoYAZnW2KBDqWpNBtBmL38LRgqJR3go2DnXp6uNHAjL4ikq6n34pK
-    ESSO_CLIENT_ID: dc-NJZOrczt3ODtvaxCxxcEO0
-    ESSO_CLIENT_SECRET: arTdzQtrGNoIaENKrwN9l9
+    ESSO_CLIENT_ID: dc-8Fzo0l4QslugUV7h2VEPqg
+    ESSO_CLIENT_SECRET: bQjnKgVPHzCIEVnLWuOqHn
 phases:
   install:
     runtime-versions:
