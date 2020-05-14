@@ -12,7 +12,7 @@ phases:
       nodejs: 12
   build:
     commands:
-      - echo _auth = $ARTIFACTORY_REGISTRY_AUTH >> ~/.npmrc
+      - echo _auth = NjAxODQ4MTpBS0NwNWVtUk4zTmtIQXJZZkhQd2VvWUFablcyS0JEcVdwTkJ0Qm1MMzhMUmdxSlIzZ28yRG5YcDZ1TkhBakw0aWtxNm4zNHBLCg== >> ~/.npmrc
       - echo registry = https://tr1.jfrog.io/tr1/api/npm/npm/ >> ~/.npmrc
       - echo always-auth = true >> ~/.npmrc
       - echo email = swapna.rajendaran@thomsonreuters.com >> ~/.npmrc
