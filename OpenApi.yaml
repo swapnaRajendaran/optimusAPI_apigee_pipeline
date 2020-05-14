@@ -10,7 +10,7 @@ x-tr-asset-insight-id: "202209"
 x-tr-deploy-permissions:
   - swapna.rajendaran@thomsonreuters.com
 x-tr-promote-permissions:
-  - dc-NJZOrczt3ODtvaxCxxcEO0
+  - dc-8Fzo0l4QslugUV7h2VEPqg
 x-tr-api-version: v1
 x-tr-cors-enabled: true
 x-tr-identity-provider: MachineToMachine
