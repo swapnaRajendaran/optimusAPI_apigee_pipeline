@@ -1,10 +1,10 @@
 openapi: 3.0.1
 info:
   title: Learning management system API
-  description: API contains set of LMS endpoints which can be used by external clients as well for internal use.
+  description: APIs contains set of LMS endpoints which can be used by external clients as well for internal use.
   version: 1.0.0
 servers:
-  - url: "https://api-dev.thomsonreuters.com/trlearning/v1"
+  - url: "https://api-prod.thomsonreuters.com/trlearning/v1"
 x-tr-proxy-name: Learning
 x-tr-asset-insight-id: "202209"
 x-tr-deploy-permissions:
@@ -53,6 +53,14 @@ paths:
       summary: Finds the list of users
       description: Fetches the list of users for which the logged in User has access. Various filter options available to fetch concentrated lists
       operationId: GetUserList
+      parameters:
+        - in: query
+          name: filter
+          description: Parameters to use for filtering results
+          schema:
+            type: object
+            additionalProperties:
+              type: string
       responses:
         "200":
           description: successful operation
@@ -60,6 +68,27 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UserList200Response"
+        "401":
+          description: Invalid credentials
+          content: {}
+        "403":
+          description: Permission denied
+          content: {}
+        "404":
+          description: Not Found
+          content: {}
+        "406":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InvalidParameterResponse"
+        "500":
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OptimusErrorResponse"
       security:
         - OAuth2:
             - "write:lms"
@@ -89,9 +118,21 @@ paths:
         "403":
           description: Permission denied
           content: {}
+        "404":
+          description: Not Found
+          content: {}
         "406":
           description: Invalid input
-          content: {}
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InvalidParameterResponse"
+        "500":
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OptimusErrorResponse"
       security:
         - OAuth2:
             - "write:lms"
@@ -119,9 +160,21 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/User200Response"
-        "404":
-          description: user not found
+        "401":
+          description: Invalid credentials
           content: {}
+        "403":
+          description: Permission denied
+          content: {}
+        "404":
+          description: Not Found
+          content: {}
+        "500":
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OptimusErrorResponse"
       security:
         - OAuth2:
             - "write:lms"
@@ -139,7 +192,6 @@ paths:
           required: true
           schema:
             type: integer
-            format: int64
       requestBody:
         description: user object that needs to be added
         content:
@@ -154,39 +206,32 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UpdateUserResponse"
-        "404":
-          description: user not found
+        "401":
+          description: Invalid credentials
           content: {}
+        "403":
+          description: Permission denied
+          content: {}
+        "404":
+          description: Not Found
+          content: {}
+        "406":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InvalidParameterResponse"
+        "500":
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OptimusErrorResponse"
       security:
         - OAuth2:
             - "write:lms"
             - "read:lms"
       x-codegen-request-body-name: body
-    delete:
-      tags:
-        - user
-      summary: Delete user by user id
-      description: Delete existing user
-      operationId: DeleteUser
-      parameters:
-        - name: userId
-          in: path
-          description: ID of user to delete
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        "200":
-          description: Delete Success
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Delete200Response"
-      security:
-        - OAuth2:
-            - "write:lms"
-            - "read:lms"
   /courses:
     get:
       tags:
@@ -194,6 +239,14 @@ paths:
       summary: Finds the list of courses
       description: Fetches the list of courses for which the logged in User has access
       operationId: GetCourseList
+      parameters:
+        - in: query
+          name: filter
+          description: Parameters to use for filtering results
+          schema:
+            type: object
+            additionalProperties:
+              type: string
       responses:
         "200":
           description: successful operation
@@ -203,6 +256,27 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/CourseGet200Response"
+        "401":
+          description: Invalid credentials
+          content: {}
+        "403":
+          description: Permission denied
+          content: {}
+        "404":
+          description: Not Found
+          content: {}
+        "406":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InvalidParameterResponse"
+        "500":
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OptimusErrorResponse"
       security:
         - OAuth2:
             - "write:lms"
@@ -235,12 +309,21 @@ paths:
         "403":
           description: Permission denied
           content: {}
+        "404":
+          description: Not Found
+          content: {}
         "406":
-          description: not acceptable
+          description: Invalid input
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/InvalidParameterResponse"
+        "500":
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OptimusErrorResponse"
       security:
         - OAuth2:
             - "write:lms"
@@ -257,7 +340,6 @@ paths:
           in: path
           schema:
             type: integer
-            format: int64
           required: true
       responses:
         "200":
@@ -266,42 +348,27 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Course200Response"
+        "401":
+          description: Invalid credentials
+          content: {}
+        "403":
+          description: Permission denied
+          content: {}
+        "404":
+          description: Not Found
+          content: {}
+        "406":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InvalidParameterResponse"
         "500":
-          description: Server error
+          description: Server Error
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/OptimusErrorResponse"
-      security:
-        - OAuth2:
-            - "write:lms"
-            - "read:lms"
-    delete:
-      tags:
-        - course
-      summary: deletes course by course id
-      description: Delete course info based on course id provided.
-      operationId: DeleteCourseByCourseId
-      parameters:
-        - name: courseId
-          in: path
-          schema:
-            type: integer
-            format: int64
-          required: true
-      responses:
-        "200":
-          description: Delete Success
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Delete200Response"
-        "500":
-          description: Auto generated using Swagger Inspector
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/CourseDelete500Response"
       security:
         - OAuth2:
             - "write:lms"
@@ -323,7 +390,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CoursePut"
+              $ref: "#/components/schemas/UpdateCourseRequest"
           multipart/form-data:
               schema:
                 $ref: "#/components/schemas/CourseMultipartPut"
@@ -334,8 +401,27 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UpdateCourseResponse"
+        "401":
+          description: Invalid credentials
+          content: {}
+        "403":
+          description: Permission denied
+          content: {}
+        "404":
+          description: Not Found
+          content: {}
         "406":
-          $ref: "#/components/schemas/InvalidParameterResponse"
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InvalidParameterResponse"
+        "500":
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OptimusErrorResponse"
       security:
         - OAuth2:
             - "write:lms"
@@ -356,6 +442,27 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/BranchesGet200Response"
+        "401":
+          description: Invalid credentials
+          content: {}
+        "403":
+          description: Permission denied
+          content: {}
+        "404":
+          description: Not Found
+          content: {}
+        "406":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InvalidParameterResponse"
+        "500":
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OptimusErrorResponse"
       security:
         - OAuth2:
             - "write:lms"
@@ -376,6 +483,27 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/CatalogsGet200Response"
+        "401":
+          description: Invalid credentials
+          content: {}
+        "403":
+          description: Permission denied
+          content: {}
+        "404":
+          description: Not Found
+          content: {}
+        "406":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InvalidParameterResponse"
+        "500":
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OptimusErrorResponse"
       security:
         - OAuth2:
             - "write:lms"
@@ -407,15 +535,23 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/EnrollmentPost200Response"
-
+        "401":
+          description: Invalid credentials
+          content: {}
+        "403":
+          description: Permission denied
+          content: {}
+        "404":
+          description: Not Found
+          content: {}
         "406":
-          description: Not acceptable
+          description: Invalid input
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/InvalidParameterResponse"
         "500":
-          description: Error
+          description: Server Error
           content:
             application/json:
               schema:
@@ -442,7 +578,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/EnrollUserRequest"
+              $ref: "#/components/schemas/PassUserRequest"
       responses:
         "200":
           description: success
@@ -450,220 +586,36 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/EnrollmentPut200Response"
-        "406":
-          description: not acceptable
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/InvalidParameterResponse"
-      security:
-        - OAuth2:
-            - "write:lms"
-            - "read:lms"
-  "/courses/{courseId}/classroomsessions":
-    post:
-      tags:
-        - classroomsessions
-      summary: Adds a classroom session for a particular course
-      description: Adds a classroom session for a given course id
-      operationId: AddClassroomSession
-      parameters:
-        - name: courseId
-          in: path
-          schema:
-            type: integer
-            format: int64
-          required: true
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/ClassroomSessionPost"
-      responses:
-        '200':
-          description: Success
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ClassroomSession200Response"
-        '406':
-          description: not acceptable
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/InvalidParameterResponse"
-      security:
-        - OAuth2:
-            - "write:lms"
-            - "read:lms"
-  "/courses/{courseId}/classroomsessions/{sessionId}":
-    delete:
-      tags:
-        - classroomsessions
-      summary: Deletes classroom session by session id
-      description: Delete classroom session info based on sessiond id provided.
-      operationId: DeleteClassroomSessionBySessionId
-      parameters:
-        - name: courseId
-          in: path
-          schema:
-            type: integer
-            format: int64
-          required: true
-        - name: sessionId
-          in: path
-          schema:
-            type: integer
-            format: int64
-          required: true
-      responses:
-        "200":
-          description: Delete Success
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Delete200Response"
-      security:
-        - OAuth2:
-            - "write:lms"
-            - "read:lms"
-  "/courses/{courseId}/webinarsessions":
-    post:
-      tags:
-        - webinarsessions
-      summary: Adds a webinar session for a particular course
-      description: Adds a webinar session for a given course id
-      operationId: AddWebinarSession
-      parameters:
-        - name: courseId
-          in: path
-          schema:
-            type: integer
-            format: int64
-          required: true
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/WebinarSessionPost"
-      responses:
-        '200':
-          description: Success
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/WebinarSession200Response"
-        '406':
-          description: not acceptable
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/InvalidParameterResponse"
-      security:
-        - OAuth2:
-            - "write:lms"
-            - "read:lms"
-  "/courses/{courseId}/accreditation":
-      post:
-        tags:
-          - accreditation
-        summary: Adds an accreditation for a particular course
-        description: Adds an accreditation for a given course id
-        operationId: AddAccreditingCourse
-        parameters:
-          - name: courseId
-            in: path
-            schema:
-              type: integer
-              format: int64
-            required: true
-        requestBody:
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AccreditingCoursePost"
-        responses:
-          '200':
-            description: Success
-            content:
-              application/json:
-                schema:
-                  $ref: "#/components/schemas/AccreditingCoursePost200Response"
-          '406':
-            description: not acceptable
-            content:
-              application/json:
-                schema:
-                  $ref: "#/components/schemas/InvalidParameterResponse"
-        security:
-        - OAuth2:
-            - "write:lms"
-            - "read:lms"
-  /lp:
-    get:
-      tags:
-        - learningplan
-      summary: Finds the list of learning plans
-      description: Fetches the list of learning plans for which the logged in User has access
-      operationId: GetLearningPlanList
-      responses:
-        "200":
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/LearningPlanListGet200Response"
-      security:
-        - OAuth2:
-            - "write:lms"
-            - "read:lms"
-    post:
-      tags:
-        - learningplan
-      summary: Add new learning plan
-      description: New learning plan can be added within the catalog that the logged in user has access to
-      operationId: AddLearningPlan
-      requestBody:
-        description: New learning plan object can be added by the authorized user
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/LearningPlanPost"
-          multipart/form-data:
-              schema:
-                $ref: "#/components/schemas/LearningPlanMultipartPost"
-      responses:
-        "200":
-          description: created successfully
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/LearningPlanPost200Response"
         "401":
           description: Invalid credentials
           content: {}
         "403":
           description: Permission denied
           content: {}
+        "404":
+          description: Not Found
+          content: {}
         "406":
-          description: not acceptable
+          description: Invalid input
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/InvalidParameterResponse"
+        "500":
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OptimusErrorResponse"
       security:
         - OAuth2:
             - "write:lms"
-            - "read:lms"  
+            - "read:lms"
 components:
   schemas:
     AddUserRequest:
       type: "object"
       properties:
-        id:
-          type: "string"
         username:
           type: "string"
         firstName:
@@ -673,24 +625,6 @@ components:
         email:
           type: "string"
         password:
-          type: "string"
-        title:
-          type: "string"
-        office:
-          type: "string"
-        department:
-          type: "string"
-        city:
-          type: "string"
-        state:
-          type: "string"
-        country:
-          type: "string"
-        postalcode:
-          type: "string"
-        phonenumber:
-          type: "string"
-        hiredate:
           type: "string"
         branches:
           type: "array"
@@ -707,13 +641,7 @@ components:
               - "id"
               - "code"
               - "title"
-        instructor:
-          type: "boolean"
         ismanager:
-          type: "boolean"
-        iscoach:
-          type: "boolean"
-        isexpired:
           type: "boolean"
         irsptin:
           type: "string"
@@ -721,20 +649,18 @@ components:
           type: "string"
         cfp:
           type: "string"
-        managername:
-          type: "string"
-        groupname:
-          type: "string"
         timezone:
           type: "string"
-        writeaccess:
-          type: "boolean"
         level:
           type: "string"
           enum:
             - "USER"
             - "SUPER_ADMIN"
             - "POWER_USER"
+        additionalFields:
+          type: "object"
+          additionalProperties:
+            type: "string"
       required:
         - "username"
         - "firstName"
@@ -755,24 +681,6 @@ components:
           type: "string"
         password:
           type: "string"
-        title:
-          type: "string"
-        office:
-          type: "string"
-        department:
-          type: "string"
-        city:
-          type: "string"
-        state:
-          type: "string"
-        country:
-          type: "string"
-        postalcode:
-          type: "string"
-        phonenumber:
-          type: "string"
-        hiredate:
-          type: "string"
         branches:
           type: "array"
           items:
@@ -788,13 +696,7 @@ components:
               - "id"
               - "code"
               - "title"
-        instructor:
-          type: "boolean"
         ismanager:
-          type: "boolean"
-        iscoach:
-          type: "boolean"
-        isexpired:
           type: "boolean"
         irsptin:
           type: "string"
@@ -802,20 +704,18 @@ components:
           type: "string"
         cfp:
           type: "string"
-        managername:
-          type: "string"
-        groupname:
-          type: "string"
         timezone:
           type: "string"
-        writeaccess:
-          type: "boolean"
         level:
           type: "string"
           enum:
             - "USER"
             - "SUPER_ADMIN"
             - "POWER_USER"
+        additionalFields:
+          type: "object"
+          additionalProperties:
+            type: "string"
     AddCourseRequest:
       type: "object"
       properties:
@@ -891,105 +791,13 @@ components:
           type: "boolean"
         isPublished:
           type: "boolean"
-        instructors:
-          type: "array"
-          items:
-            type: "object"
-            properties:
-              avatar_url:
-                type: "string"
-              firstname:
-                type: "string"
-              instructor_id:
-                type: "number"
-              lastname:
-                type: "string"
-              username:
-                type: "string"
-            required:
-              - "avatar_url"
-              - "firstname"
-              - "instructor_id"
-              - "lastname"
-              - "username"
-        sessionList:
-          type: "array"
-          items:
-            type: "object"
-            properties:
-              dates:
-                type: "array"
-                items:
-                  type: "object"
-                  properties:
-                    date:
-                      type: "string"
-                    end_hour:
-                      type: "string"
-                    gmt:
-                      type: "string"
-                    name:
-                      type: "string"
-                    start_hour:
-                      type: "string"
-                    timezone:
-                      type: "string"
-                  required:
-                    - "date"
-                    - "name"
-                    - "timezone"
-              end_date:
-                type: "string"
-              id_session:
-                type: "number"
-              locations:
-                type: "array"
-                items:
-                  type: "object"
-                  properties:
-                    accommodation:
-                      type: "string"
-                    address:
-                      type: "string"
-                    email:
-                      type: "string"
-                    id_country:
-                      type: "number"
-                    id_location:
-                      type: "number"
-                    id_zone:
-                      type: "number"
-                    iso_code_country:
-                      type: "string"
-                    name:
-                      type: "string"
-                    name_country:
-                      type: "string"
-                    other_info:
-                      type: "string"
-                    reaching_info:
-                      type: "string"
-                    telephone:
-                      type: "string"
-                  required:
-                    - "id_location"
-                    - "name"
-                    - "name_country"
-              name:
-                type: "string"
-              start_date:
-                type: "string"
-            required:
-              - "dates"
-              - "end_date"
-              - "id_session"
-              - "name"
-              - "start_date"
       required:
         - "catalogId"
         - "courseType"
         - "courseTitle"
         - "courseDescription"
+      additionalProperties:
+        type: "string"
     UpdateCourseRequest:
       type: "object"
       properties:
@@ -1065,100 +873,8 @@ components:
           type: "boolean"
         isPublished:
           type: "boolean"
-        instructors:
-          type: "array"
-          items:
-            type: "object"
-            properties:
-              avatar_url:
-                type: "string"
-              firstname:
-                type: "string"
-              instructor_id:
-                type: "number"
-              lastname:
-                type: "string"
-              username:
-                type: "string"
-            required:
-              - "avatar_url"
-              - "firstname"
-              - "instructor_id"
-              - "lastname"
-              - "username"
-        sessionList:
-          type: "array"
-          items:
-            type: "object"
-            properties:
-              dates:
-                type: "array"
-                items:
-                  type: "object"
-                  properties:
-                    date:
-                      type: "string"
-                    end_hour:
-                      type: "string"
-                    gmt:
-                      type: "string"
-                    name:
-                      type: "string"
-                    start_hour:
-                      type: "string"
-                    timezone:
-                      type: "string"
-                  required:
-                    - "date"
-                    - "name"
-                    - "timezone"
-              end_date:
-                type: "string"
-              id_session:
-                type: "number"
-              locations:
-                type: "array"
-                items:
-                  type: "object"
-                  properties:
-                    accommodation:
-                      type: "string"
-                    address:
-                      type: "string"
-                    email:
-                      type: "string"
-                    id_country:
-                      type: "number"
-                    id_location:
-                      type: "number"
-                    id_zone:
-                      type: "number"
-                    iso_code_country:
-                      type: "string"
-                    name:
-                      type: "string"
-                    name_country:
-                      type: "string"
-                    other_info:
-                      type: "string"
-                    reaching_info:
-                      type: "string"
-                    telephone:
-                      type: "string"
-                  required:
-                    - "id_location"
-                    - "name"
-                    - "name_country"
-              name:
-                type: "string"
-              start_date:
-                type: "string"
-            required:
-              - "dates"
-              - "end_date"
-              - "id_session"
-              - "name"
-              - "start_date"
+      additionalProperties:
+        type: "string"
     CourseMultipartPost:
       type: object
       properties:
@@ -1171,32 +887,40 @@ components:
       type: object
       properties:
         body:
-          $ref: "#/components/schemas/CoursePut"
+          $ref: "#/components/schemas/UpdateCourseRequest"
         image:
           type: string
           format: binary
-    EnrollmentPut:
-      type: object
+    PassUserRequest:
+      type: "object"
       properties:
         courseId:
-          type: integer
+          type: "number"
         enrollmentStatus:
-          type: string
-    EnrollmentPost:
-      type: object
+          type: "string"
+      required:
+        - "courseId"
+        - "enrollmentStatus"
+    EnrollUserRequest:
+      type: "object"
       properties:
         courseIds:
-          type: array
-          items:
-            type: integer
+          type: "object"
         level:
-          type: string
-        userIds:
-          type: array
-          items:
-            type: integer
+          type: "string"
+          enum:
+            - "WAITING_LIST"
+            - "SUBSCRIBED"
+            - "ENROLLED"
+            - "IN_PROGRESS"
+            - "COMPLETED"
+            - "SUSPEND"
         sessionId:
-          type: integer
+          type: "number"
+        enrollmentFields:
+          type: "object"
+      required:
+        - "level"
     AddUserResponse:
       type: "object"
       properties:
@@ -1257,183 +981,6 @@ components:
           type: "integer"
         success:
           type: "boolean"
-    Delete200Response:
-      type: object
-      properties:
-        success:
-          type: boolean
-        correlationId:
-          type: string
-        body:
-          type: object
-          properties:
-            success:
-              type: boolean
-            message:
-              type: string
-        statusCode:
-          type: integer
-    UserPut:
-      type: object
-      properties:
-        lastName:
-          type: string
-        country:
-          type: string
-        ismanager:
-          type: boolean
-        hiredate:
-          type: string
-        city:
-          type: string
-        timezone:
-          type: string
-        phonenumber:
-          type: string
-        office:
-          type: string
-        title:
-          type: string
-        ctech:
-          type: string
-        password:
-          type: string
-        isexpired:
-          type: boolean
-        postalcode:
-          type: string
-        writeaccess:
-          type: boolean
-        managername:
-          type: string
-        id:
-          type: string
-        state:
-          type: string
-        department:
-          type: string
-        email:
-          type: string
-        iscoach:
-          type: boolean
-        level:
-          type: string
-          enum:
-            - USER
-            - SUPER_ADMIN
-            - POWER_USER
-        irsptin:
-          type: string
-        cfp:
-          type: string
-        branches:
-          type: array
-          items:
-            type: object
-            properties:
-              code:
-                type: string
-              id:
-                type: integer
-              title:
-                type: string
-        groupname:
-          type: string
-        firstName:
-          type: string
-        instructor:
-          type: boolean
-        username:
-          type: string
-      required:
-        - username
-        - password
-        - firstName
-        - lastName
-        - email
-    UserPost:
-      type: object
-      properties:
-        lastName:
-          type: string
-        country:
-          type: string
-        ismanager:
-          type: boolean
-        hiredate:
-          type: string
-        city:
-          type: string
-        timezone:
-          type: string
-        phonenumber:
-          type: string
-        office:
-          type: string
-        title:
-          type: string
-        ctech:
-          type: string
-        password:
-          type: string
-        isexpired:
-          type: boolean
-        postalcode:
-          type: string
-        writeaccess:
-          type: boolean
-        managername:
-          type: string
-        state:
-          type: string
-        department:
-          type: string
-        email:
-          type: string
-        iscoach:
-          type: boolean
-        level:
-          type: string
-          enum:
-            - USER
-            - SUPER_ADMIN
-            - POWER_USER
-        irsptin:
-          type: string
-        cfp:
-          type: string
-        branches:
-          type: array
-          items:
-            type: object
-            properties:
-              code:
-                type: string
-              id:
-                type: integer
-              title:
-                type: string
-            required:
-              - code
-              - id
-              - title
-        groupname:
-          type: string
-        firstName:
-          type: string
-        instructor:
-          type: boolean
-        username:
-          type: string
-      required:
-        - username
-        - password
-        - firstName
-        - lastName
-        - email
-        - level
-      xml:
-        name: User
     CourseGet200Response:
       type: object
       properties:
@@ -1501,32 +1048,6 @@ components:
           type: boolean
       xml:
         name: Course
-    CourseDelete500Response:
-      type: object
-      properties:
-        success:
-          type: boolean
-        errorCode:
-          type: string
-        correlationId:
-          type: string
-        body:
-          type: object
-          properties:
-            exception:
-              type: string
-            path:
-              type: string
-            error:
-              type: string
-            message:
-              type: string
-            timestamp:
-              type: number
-            status:
-              type: integer
-        statusCode:
-          type: integer
     BranchesGet200Response:
       type: object
       properties:
@@ -1740,121 +1261,6 @@ components:
                 type: integer
         statusCode:
           type: integer
-    CoursePost:
-      type: object
-      properties:
-        selfUnenrollment:
-          type: integer
-        courseType:
-          type: string
-        startDate:
-          type: string
-        endDate:
-          type: string
-        courseCode:
-          type: string
-        courseAutoPlay:
-          type: integer
-        courseCategory:
-          type: integer
-        courseTitle:
-          type: string
-        dayOfValidity:
-          type: integer
-        catalogId:
-          type: integer
-        demoMaterial:
-          type: string
-        advancedPreparations:
-          type: string
-        enrollmentPolicy:
-          type: integer
-        price:
-          type: integer
-        onSale:
-          type: boolean
-        showCourse:
-          type: integer
-        courseFinalScoreCalculation:
-          type: integer
-        prerequisitesList:
-          type: string
-        waitingList:
-          type: integer
-        level:
-          type: string
-        isPublished:
-          type: boolean
-        majorTopics:
-          type: string
-        maxSubscriptionQuota:
-          type: integer
-        courseDescription:
-          type: string
-        maximumNumberOfAttempts:
-          type: integer
-        targetAudience:
-          type: string
-        courseNavigationPolicy:
-          type: integer
-        validity:
-          type: integer
-        courseInitialScoreCalculation:
-          type: integer
-        courseObjective:
-          type: string
-        courseSubscription:
-          type: integer
-      required:
-        - catalogId
-        - courseType
-        - courseDescription
-        - courseTitle
-    CoursePut:
-      type: object
-      properties:
-        selfUnenrollment:
-          type: integer
-        courseType:
-          type: string
-        prerequisitesList:
-          type: string
-        waitingList:
-          type: integer
-        startDate:
-          type: string
-        endDate:
-          type: string
-        level:
-          type: string
-        isPublished:
-          type: boolean
-        courseCode:
-          type: string
-        majorTopics:
-          type: string
-        courseObjectives:
-          type: string
-        courseAutoPlay:
-          type: integer
-        courseDescription:
-          type: string
-        courseCategory:
-          type: integer
-        courseTitle:
-          type: string
-        demoMaterial:
-          type: string
-        advancedPreparation:
-          type: string
-        targetAudience:
-          type: string
-        enrollmentPolicy:
-          type: integer
-        price:
-          type: integer
-        onSale:
-          type: boolean
     Course200Response:
       type: object
       properties:
@@ -2071,130 +1477,6 @@ components:
               type: string
         statusCode:
           type: integer
-    ClassroomSessionPost:
-      type: object
-      properties:
-        code:
-          type: string
-        lastSubscriptionDate:
-          type: string
-        minimumEnrollments:
-          type: integer
-        sessionName:
-          type: string
-        maximumEnrollments:
-          type: integer
-        dates:
-          type: array
-          items:
-            type: object
-            properties:
-              timeEnd:
-                type: string
-              timeBegin:
-                type: string
-              sessionDayName:
-                type: string
-              timezone:
-                type: string
-              locationId:
-                type: integer
-              breakEnd:
-                type: string
-              classroomId:
-                type: integer
-              breakBegin:
-                type: string
-              day:
-                type: string
-      required:
-        - sessionName
-        - maximumEnrollments
-        - day
-        - timeBegin
-        - timeEnd
-        - locationId
-    ClassroomSession200Response:
-      type: object
-      properties:
-        success:
-          type: boolean
-        correlationId:
-          type: string
-        body:
-          type: object
-          properties:
-            message:
-              type: string
-        statusCode:
-          type: integer
-    WebinarSessionPost:
-      type: object
-      properties:
-        completion:
-          type: string
-        code:
-          type: string
-        record_accessed:
-          type: boolean
-        name:
-          type: string
-        description:
-          type: string
-        dates:
-          type: array
-          items:
-            type: object
-            properties:
-              webinartool:
-                type: string
-              timezone:
-                type: string
-              time_begin:
-                type: string
-              description:
-                type: string
-              url:
-                type: string
-              instructorjoin:
-                type: string
-              learnerjoin:
-                type: string
-              break_begin:
-                type: string
-              name:
-                type: string
-              oauthaccount:
-                type: string
-              time_end:
-                type: string
-              day:
-                type: string
-              break_end:
-                type: string
-        max_enroll:
-          type: integer
-        min_session:
-          type: integer
-      required:
-        - name
-        - max_enroll
-        - day
-        - sessionDateDuration    
-    WebinarSession200Response:
-      type: object
-      properties:
-        success:
-          type: boolean
-        correlationId:
-          type: string
-        body:
-          type: object
-          properties:
-            message:
-              type: string
-        statusCode:
-          type: integer
     OptimusErrorResponse:
       type: object
       properties:
@@ -2244,269 +1526,12 @@ components:
                     type: string
         statusCode:
           type: integer
-    Tag:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-        name:
-          type: string
-      xml:
-        name: Tag
-    ApiResponse:
-      type: object
-      properties:
-        code:
-          type: integer
-          format: int32
-        type:
-          type: string
-        message:
-          type: string
-    LearningPlanPost:
-      type: object
-      properties:
-        learningPlanName:
-          type: string
-        learningPlanDescription:
-          type: string
-        learningPlanCode:
-          type: string
-        addToCourseCatalog:
-          type: boolean
-        dayOfValidity:
-          type: string
-        image:
-          type: string
-        channels:
-          type: string
-        certificate:
-          type: string
-        certificationAndRetraining:
-          type: string
-        enrollmentEnabled:
-          type: boolean
-      required:
-        - learningPlanName
-        - learningPlanDescription
-    LearningPlanPost200Response:
-      type: "object"
-      properties:
-        learningPlanName:
-          type: "string"
-        learningPlanDescription:
-          type: "string"
-        learningPlanCode:
-          type: "string"
-        addToCourseCatalog:
-          type: "boolean"
-        dayOfValidity:
-          type: "string"
-        image:
-          type: "string"
-        channels:
-          type: "string"
-        certificate:
-          type: "string"
-        certificationAndRetraining:
-          type: "string"
-        enrollmentEnabled:
-          type: "boolean"
-      required:
-        - "learningPlanName"
-        - "learningPlanDescription"
-    LearningPlanMultipartPost:
-      type: object
-      properties:
-        body:
-          $ref: "#/components/schemas/LearningPlanPost"
-        image:
-          type: string
-          format: binary
-    
-    LearningPlanListGet200Response:
-      type: "object"
-      properties:
-        success:
-          type: boolean
-        correlationId:
-          type: string
-        body:
-          type: array
-          items:
-            type: object
-            properties:
-              learningPlanId:
-                type: string
-              learningPlanAccessLevel:
-                type: string
-              learningPlanName:
-                type: string
-        statusCode:
-          type: integer
-    AccreditingCoursePost:
-      type: object
-      properties:
-        courseDeliveryFormat:
-          type: string
-        sponsor:
-          type: object
-          properties:
-            sponsorId:
-              type: string
-            sponsorName:
-              type: string 
-            sponsorIdNo:
-              type: integer
-        regulators:
-          type: array
-          items:
-            type: object
-            properties:
-              regulatorId:
-                type: string
-              regulatorName:
-                type: string
-        fieldsofStudy:
-          type: array
-          items:
-            type: object
-            properties:
-              id:
-                type: string
-              name:
-                type: string
-              duration:
-                type: integer
-        questionnaire:
-          type: array
-          items:
-            type: object
-            properties:
-              qId:
-                type: string
-              aId:
-                type: string
-              aTxt:
-                type: string
-      required:
-        - courseDeliveryFormat
-        - sponsor
-        - regulators
-        - sessionDateDuration    
-        - fieldsofStudy
-        - questionnaire  
-    AccreditingCoursePost200Response:
-      type: "object"
-      properties:
-        courseDeliveryFormat:
-          type: "string"
-          enum:
-            - "Blended Learning (Group)"
-            - "Blended Learning (Self-Study)"
-            - "Group Internet Based (Recorded)"
-            - "Group Internet Based (Webinar)"
-            - "Group Live (Classroom)"
-            - "Nano-Learning"
-            - "Self-Study Interactive"
-            - "Self-Study Non-Interactive"
-        sponsor:
-          type: "object"
-          properties:
-            sponsorId:
-              type: "string"
-            sponsorName:
-              type: "string"
-            sponsorIdNo:
-              type: "number"
-          required:
-            - "sponsorId"
-            - "sponsorName"
-            - "sponsorIdNo"
-        regulators:
-          type: "array"
-          items:
-            type: "object"
-            properties:
-              regulatorName:
-                type: "string"
-                enum:
-                  - "Standard Regulators and NASBA"
-                  - "California Registered Tax Preparer (CTEC)"
-                  - "Certified Financial Planner (CFP)"
-                  - "IRS (Enrolled Agent/Non-Credentialed Return Preparer)"
-              regulatorId:
-                type: "string"
-            required:
-              - "regulatorName"
-              - "regulatorId"
-        fieldsofStudy:
-          type: "array"
-          items:
-            type: "object"
-            properties:
-              id:
-                type: "string"
-              name:
-                type: "string"
-                enum:
-                  - "Accounting"
-                  - "Accounting (Govt.)"
-                  - "Auditing"
-                  - "Auditing (Govt)"
-                  - "Behavioral Ethics"
-                  - "Business Law"
-                  - "Business Management and Organization"
-                  - "Business Valuation"
-                  - "Communications and Marketing"
-                  - "Computer Software and Applications"
-                  - "Economics"
-                  - "Employee Benefits"
-                  - "Finance"
-                  - "Fraud"
-                  - "Information Technology"
-                  - "Management Services"
-                  - "Personal Development"
-                  - "Personnel/Human Resources"
-                  - "Production"
-                  - "Regulatory Ethics"
-                  - "Specialized Knowledge"
-                  - "Statistics"
-                  - "Taxes"
-              duration:
-                type: "number"
-            required:
-              - "id"
-              - "name"
-              - "duration"
-        questionnaire:
-          type: "array"
-          items:
-            type: "object"
-            properties:
-              qId:
-                type: "string"
-              aId:
-                type: "string"
-              aTxt:
-                type: "string"
-            required:
-              - "qId"
-              - "aId"
-              - "aTxt"
-      required:
-        - "courseDeliveryFormat"
-        - "sponsor"
-        - "regulators"
-        - "fieldsofStudy"
-        - "questionnaire"
   securitySchemes:
     OAuth2:
       type: oauth2
       flows:
         clientCredentials:
-          tokenUrl: "https://api-dev.thomsonreuters.com/tr-oauth/v1/token"
+          tokenUrl: "https://api-prod.thomsonreuters.com/tr-oauth/v1/token"
           scopes:
             "write:lms": modify lms in your account
             "read:lms": read your lms
