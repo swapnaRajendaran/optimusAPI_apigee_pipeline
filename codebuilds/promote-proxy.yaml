@@ -1,0 +1,20 @@
+version: 0.2
+env:
+  secrets-manager:
+    # use the name of your secrets manager in the codepipline.yaml
+    # For example a202210-codepipeline-tutorial-secrets-manager/secrets
+   ARTIFACTORY_REGISTRY_AUTH: NjAxODQ4MTpBS0NwNWVtUk4zTmtIQXJZZkhQd2VvWUFablcyS0JEcVdwTkJ0Qm1MMzhMUmdxSlIzZ28yRG5YcDZ1TkhBakw0aWtxNm4zNHBL
+   ESSO_CLIENT_ID: dc-8Fzo0l4QslugUV7h2VEPqg
+   ESSO_CLIENT_SECRET: bQjnKgVPHzCIEVnLWuOqHn
+phases:
+  install:
+    runtime-versions:
+      nodejs: 12
+  build:
+    commands:
+      - echo _auth = $ARTIFACTORY_REGISTRY_AUTH >> ~/.npmrc
+      - echo registry = https://tr1.jfrog.io/tr1/api/npm/npm/ >> ~/.npmrc
+      - echo always-auth = true >> ~/.npmrc
+      - echo email = swapna.rajendaran@thomsonreuters.com >> ~/.npmrc
+      - npm install -g tr-apigee-integration-tool
+      - apigee-integration-tool promoteApi -s "./OpenApi.yaml" -O ${APIGEE_SOURCE_ORGANIZATION} -E ${APIGEE_SOURCE_ENVIRONMENT} -o ${APIGEE_DESTINATION_ORGANIZATION} -e ${APIGEE_DESTINATION_ENVIRONMENT}
