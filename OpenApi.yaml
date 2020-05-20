@@ -4,7 +4,7 @@ info:
   description: APIs contains set of LMS endpoints which can be used by external clients as well for internal use.
   version: 1.0.0
 servers:
-  - url: "https://api-prod.thomsonreuters.com/trlearning/v1"
+  - url: "https://api-dev.thomsonreuters.com/trlearning/v1"
 x-tr-proxy-name: Learning
 x-tr-asset-insight-id: "202209"
 x-tr-deploy-permissions:
@@ -45,6 +45,10 @@ tags:
     description: LMS branch
   - name: catalogs
     description: LMS catalogs
+  - name: location
+    description: LMS locations
+  - name: sessions
+    description: LMS sessions
 paths:
   /users:
     get:
@@ -67,7 +71,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UserList200Response"
+                $ref: "#/components/schemas/GetUserListResponse"
         "401":
           description: Invalid credentials
           content: {}
@@ -137,7 +141,6 @@ paths:
         - OAuth2:
             - "write:lms"
             - "read:lms"
-      x-codegen-request-body-name: body
   "/users/{userId}":
     get:
       tags:
@@ -159,7 +162,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/User200Response"
+                $ref: "#/components/schemas/GetUserResponse"
         "401":
           description: Invalid credentials
           content: {}
@@ -231,7 +234,52 @@ paths:
         - OAuth2:
             - "write:lms"
             - "read:lms"
-      x-codegen-request-body-name: body
+    delete:
+      tags:
+        - user
+      summary: Deletes a user based on id
+      description: Deletes a user by id
+      operationId: DeleteUser
+      parameters:
+        - name: userId
+          in: path
+          description: ID of user to delete
+          schema:
+            type: integer
+            format: int64
+          required: true
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteUserResponse"
+        "401":
+          description: Invalid credentials
+          content: {}
+        "403":
+          description: Permission denied
+          content: {}
+        "404":
+          description: Not Found
+          content: {}
+        "406":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InvalidParameterResponse"
+        "500":
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OptimusErrorResponse"
+      security:
+        - OAuth2:
+            - "write:lms"
+            - "read:lms"
   /courses:
     get:
       tags:
@@ -255,7 +303,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/CourseGet200Response"
+                  $ref: "#/components/schemas/GetCourseListResponse"
         "401":
           description: Invalid credentials
           content: {}
@@ -347,7 +395,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Course200Response"
+                $ref: "#/components/schemas/GetCourseResponse"
         "401":
           description: Invalid credentials
           content: {}
@@ -426,6 +474,52 @@ paths:
         - OAuth2:
             - "write:lms"
             - "read:lms"
+    delete:
+      tags:
+        - course
+      summary: Deletes a course based on id
+      description: Deletes a course by id
+      operationId: DeleteCourse
+      parameters:
+        - name: courseId
+          in: path
+          description: ID of course to delete
+          schema:
+            type: integer
+            format: int64
+          required: true
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteCourseResponse"
+        "401":
+          description: Invalid credentials
+          content: {}
+        "403":
+          description: Permission denied
+          content: {}
+        "404":
+          description: Not Found
+          content: {}
+        "406":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InvalidParameterResponse"
+        "500":
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OptimusErrorResponse"
+      security:
+        - OAuth2:
+            - "write:lms"
+            - "read:lms"
   /branches:
     get:
       tags:
@@ -441,7 +535,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/BranchesGet200Response"
+                  $ref: "#/components/schemas/GetBranchListResponse"
         "401":
           description: Invalid credentials
           content: {}
@@ -482,7 +576,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/CatalogsGet200Response"
+                  $ref: "#/components/schemas/GetCatalogListResponse"
         "401":
           description: Invalid credentials
           content: {}
@@ -534,7 +628,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/EnrollmentPost200Response"
+                $ref: "#/components/schemas/EnrollUserResponse"
         "401":
           description: Invalid credentials
           content: {}
@@ -585,7 +679,297 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/EnrollmentPut200Response"
+                $ref: "#/components/schemas/PassUserResponse"
+        "401":
+          description: Invalid credentials
+          content: {}
+        "403":
+          description: Permission denied
+          content: {}
+        "404":
+          description: Not Found
+          content: {}
+        "406":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InvalidParameterResponse"
+        "500":
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OptimusErrorResponse"
+      security:
+        - OAuth2:
+            - "write:lms"
+            - "read:lms"
+  /locations:
+    post:
+      tags:
+        - location
+      summary: Adds a new location
+      description: Adds a new location
+      operationId: AddLocation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AddLocationRequest"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AddLocationResponse"
+        "401":
+          description: Invalid credentials
+          content: {}
+        "403":
+          description: Permission denied
+          content: {}
+        "404":
+          description: Not Found
+          content: {}
+        "406":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InvalidParameterResponse"
+        "500":
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OptimusErrorResponse"
+      security:
+        - OAuth2:
+            - "write:lms"
+            - "read:lms"
+  "/locations/{id}":
+    get:
+      tags:
+        - location
+      summary: Find location by location id
+      description: Fetch location info based on location id provided. The logged in user must have access to branch where the requested location id resides
+      operationId: GetLocation
+      parameters:
+        - name: id
+          in: path
+          description: ID of location to return
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetLocationResponse"
+        "401":
+          description: Invalid credentials
+          content: {}
+        "403":
+          description: Permission denied
+          content: {}
+        "404":
+          description: Not Found
+          content: {}
+        "406":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InvalidParameterResponse"
+        "500":
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OptimusErrorResponse"
+      security:
+        - OAuth2:
+            - "write:lms"
+            - "read:lms"
+    put:
+      tags:
+        - location
+      summary: Updates location for a given id
+      description: Updates location for a given id
+      operationId: UpdateLocation
+      parameters:
+        - name: id
+          in: path
+          description: ID of location to update
+          schema:
+            type: integer
+            format: int64
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateLocationRequest"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdateLocationResponse"
+        "401":
+          description: Invalid credentials
+          content: {}
+        "403":
+          description: Permission denied
+          content: {}
+        "404":
+          description: Not Found
+          content: {}
+        "406":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InvalidParameterResponse"
+        "500":
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OptimusErrorResponse"
+      security:
+        - OAuth2:
+            - "write:lms"
+            - "read:lms"
+    delete:
+      tags:
+        - location
+      summary: Deletes a location based on id
+      description: Deletes a location by id
+      operationId: DeleteLocation
+      parameters:
+        - name: id
+          in: path
+          description: ID of location to delete
+          schema:
+            type: integer
+            format: int64
+          required: true
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteLocationResponse"
+        "401":
+          description: Invalid credentials
+          content: {}
+        "403":
+          description: Permission denied
+          content: {}
+        "404":
+          description: Not Found
+          content: {}
+        "406":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InvalidParameterResponse"
+        "500":
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OptimusErrorResponse"
+      security:
+        - OAuth2:
+            - "write:lms"
+            - "read:lms"
+  "/courses/{courseId}/webinarsessions":
+    post:
+      tags:
+        - sessions
+      summary: Adds a webinar session for a particular course
+      description: Adds a webinar session for a given course id
+      operationId: AddWebinarSession
+      parameters:
+        - name: courseId
+          in: path
+          schema:
+            type: integer
+            format: int64
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AddWebinarSessionRequest"
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AddWebinarSessionResponse"
+        "401":
+          description: Invalid credentials
+          content: {}
+        "403":
+          description: Permission denied
+          content: {}
+        "404":
+          description: Not Found
+          content: {}
+        "406":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InvalidParameterResponse"
+        "500":
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OptimusErrorResponse"
+      security:
+        - OAuth2:
+            - "write:lms"
+            - "read:lms"
+  "/courses/{courseId}/classroomsessions":
+    post:
+      tags:
+        - sessions
+      summary: Adds a classroom session for a particular course
+      description: Adds a classroom session for a given course id
+      operationId: AddClassroomSession
+      parameters:
+        - name: courseId
+          in: path
+          schema:
+            type: integer
+            format: int64
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AddClassroomSessionRequest"
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AddClassroomSessionResponse"
         "401":
           description: Invalid credentials
           content: {}
@@ -613,6 +997,8 @@ paths:
             - "read:lms"
 components:
   schemas:
+    # Requests
+    # ========================
     AddUserRequest:
       type: "object"
       properties:
@@ -639,8 +1025,6 @@ components:
                 type: "string"
             required:
               - "id"
-              - "code"
-              - "title"
         ismanager:
           type: "boolean"
         irsptin:
@@ -921,6 +1305,271 @@ components:
           type: "object"
       required:
         - "level"
+    AddLocationRequest:
+      type: "object"
+      properties:
+        locationName:
+          type: "string"
+        address:
+          type: "string"
+        country:
+          type: "string"
+        locationPhoneNumber:
+          type: "string"
+        locationEmail:
+          type: "string"
+        directions:
+          type: "string"
+        suggestedAccomodations:
+          type: "string"
+        otherInfo:
+          type: "string"
+      required:
+        - "locationName"
+        - "country"
+        - "directions"
+    UpdateLocationRequest:
+      type: "object"
+      properties:
+        locationName:
+          type: "string"
+        address:
+          type: "string"
+        country:
+          type: "string"
+        locationPhoneNumber:
+          type: "string"
+        locationEmail:
+          type: "string"
+        directions:
+          type: "string"
+        suggestedAccomodations:
+          type: "string"
+        otherInfo:
+          type: "string"
+        images:
+          type: "array"
+          items:
+            type: "string"
+      required:
+        - "locationName"
+        - "country"
+        - "directions"
+    AddWebinarSessionRequest:
+      type: "object"
+      properties:
+        code:
+          type: "string"
+        name:
+          type: "string"
+        description:
+          type: "string"
+        max_enroll:
+          type: "number"
+        dates:
+          type: "array"
+          items:
+            type: "object"
+            properties:
+              day:
+                type: "string"
+              name:
+                type: "string"
+              description:
+                type: "string"
+              time_begin:
+                type: "string"
+              time_end:
+                type: "string"
+              break_begin:
+                type: "string"
+              break_end:
+                type: "string"
+              timezone:
+                type: "string"
+              sessionDateDuration:
+                type: "number"
+              instructorjoin:
+                type: "string"
+              learnerjoin:
+                type: "string"
+              webinartool:
+                type: "string"
+              url:
+                type: "string"
+              oauthaccount:
+                type: "string"
+            required:
+              - "day"
+              - "name"
+              - "sessionDateDuration"
+        completion:
+          type: "string"
+        min_session:
+          type: "number"
+        record_accessed:
+          type: "boolean"
+      required:
+        - "name"
+        - "max_enroll"
+        - "dates"
+    AddClassroomSessionRequest:
+      type: "object"
+      properties:
+        code:
+          type: "string"
+        sessionName:
+          type: "string"
+        maximumEnrollments:
+          type: "number"
+        minimumEnrollments:
+          type: "number"
+        lastSubscriptionDate:
+          type: "string"
+        dates:
+          type: "array"
+          items:
+            type: "object"
+            properties:
+              day:
+                type: "string"
+              sessionDayName:
+                type: "string"
+              timeBegin:
+                type: "string"
+              timeEnd:
+                type: "string"
+              breakBegin:
+                type: "string"
+              breakEnd:
+                type: "string"
+              timezone:
+                type: "string"
+              locationId:
+                type: "number"
+              classroomId:
+                type: "number"
+            required:
+              - "day"
+              - "timeBegin"
+              - "timeEnd"
+              - "locationId"
+      required:
+        - "sessionName"
+        - "maximumEnrollments"
+        
+    # Responses
+    # ========================
+    AddWebinarSessionResponse:
+      type: "object"
+      properties:
+        body:
+          type: "object"
+          properties:
+            id:
+              type: "string"
+            message:
+              type: "string"
+        correlationId:
+          type: "string"
+        statusCode:
+          type: "integer"
+        success:
+          type: "boolean"
+    AddClassroomSessionResponse:
+      type: "object"
+      properties:
+        body:
+          type: "object"
+          properties:
+            id:
+              type: "string"
+            message:
+              type: "string"
+        correlationId:
+          type: "string"
+        statusCode:
+          type: "integer"
+        success:
+          type: "boolean"
+    DeleteLocationResponse:
+      type: "object"
+      properties:
+        body:
+          type: "object"
+          properties:
+            message:
+              type: "string"
+        correlationId:
+          type: "string"
+        statusCode:
+          type: "integer"
+        success:
+          type: "boolean"
+    UpdateLocationResponse:
+      type: "object"
+      properties:
+        body:
+          type: "object"
+          properties:
+            message:
+              type: "string"
+        correlationId:
+          type: "string"
+        statusCode:
+          type: "integer"
+        success:
+          type: "boolean"
+    AddLocationResponse:
+      type: "object"
+      properties:
+        body:
+          type: "object"
+          properties:
+            id:
+              type: "string"
+            message:
+              type: "string"
+        correlationId:
+          type: "string"
+        statusCode:
+          type: "integer"
+        success:
+          type: "boolean"
+    GetLocationResponse:
+      type: "object"
+      properties:
+        body:
+          type: "object"
+          properties:
+            locationName:
+              type: "string"
+            address:
+              type: "string"
+            country:
+              type: "string"
+            locationPhoneNumber:
+              type: "string"
+            locationEmail:
+              type: "string"
+            directions:
+              type: "string"
+            suggestedAccomodations:
+              type: "string"
+            otherInfo:
+              type: "string"
+            id:
+              type: "integer"
+            images:
+              type: "array"
+              items:
+                type: "string"
+        correlationId:
+          type: "string"
+        statusCode:
+          type: "integer"
+        success:
+          type: "boolean"
     AddUserResponse:
       type: "object"
       properties:
@@ -981,74 +1630,275 @@ components:
           type: "integer"
         success:
           type: "boolean"
-    CourseGet200Response:
-      type: object
+    GetUserResponse:
+      type: "object"
       properties:
-        id:
-          type: string
-        internalid:
-          type: string
-        title:
-          type: string
-        description:
-          type: string
-        objective:
-          type: string
-        comment:
-          type: string
-        prerequisiteslist:
-          type: string
-        location:
-          type: string
-        level:
-          type: string
-        totalcredithours:
-          type: string
-        credithours:
-          type: string
-        startdate:
-          type: string
-        enddate:
-          type: string
-        timezone:
-          type: string
-        duration:
-          type: string
-        deliverytype:
-          type: string
-        provider:
-          type: string
-        price:
-          type: string
-        catalogid:
-          type: string
-        catalogname:
-          type: string
-        catalogitemid:
-          type: string
-        directlink:
-          type: string
-        instructoruserid:
-          type: string
-        instructorfirstname:
-          type: string
-        instructorlastname:
-          type: string
-        instructordesignation:
-          type: string
-        instructorentity:
-          type: string
-        instructorbio:
-          type: string
-        instructornotes:
-          type: string
-        instructorpicture:
-          type: string
-        isdisabled:
-          type: boolean
-      xml:
-        name: Course
-    BranchesGet200Response:
+        body:
+          type: "object"
+          properties:
+            id:
+              type: "string"
+            username:
+              type: "string"
+            email:
+              type: "string"
+            firstName:
+              type: "string"
+            lastName:
+              type: "string"
+            password:
+              type: "string"
+            level:
+              type: "string"
+            branches:
+              type: "array"
+              items:
+                type: "object"
+                properties:
+                  id:
+                    type: "string"
+            language:
+              type: "string"
+            uuid:
+              type: "string"
+            valid:
+              type: "string"
+            additionalFields:
+              properties:
+                irsptin:
+                  type: "string"
+                ctech:
+                  type: "string"
+                cfp:
+                  type: "string"
+                ismanager:
+                  type: "boolean"
+              additionalProperties:
+                type: "string"
+            success:
+              type: "boolean"
+        correlationId:
+          type: "string"
+        statusCode:
+          type: "integer"
+        success:
+          type: "boolean"
+    GetUserListResponse:
+      type: "object"
+      properties:
+        body:
+          type: "array"
+          items:
+            type: "object"
+            properties:
+              id:
+                type: "string"
+              username:
+                type: "string"
+              email:
+                type: "string"
+              firstName:
+                type: "string"
+              lastName:
+                type: "string"
+              password:
+                type: "string"
+              level:
+                type: "string"
+              branches:
+                type: "array"
+                items:
+                  type: "object"
+                  properties:
+                    id:
+                      type: "string"
+              language:
+                type: "string"
+              uuid:
+                type: "string"
+              valid:
+                type: "string"
+              additionalFields:
+                properties:
+                  irsptin:
+                    type: "string"
+                  ctech:
+                    type: "string"
+                  cfp:
+                    type: "string"
+                  ismanager:
+                    type: "boolean"
+                additionalProperties:
+                  type: "string"
+              success:
+                type: "boolean"
+        correlationId:
+          type: "string"
+        statusCode:
+          type: "integer"
+        success:
+          type: "boolean"
+    DeleteUserResponse:
+      type: "object"
+      properties:
+        body:
+          type: "object"
+          properties:
+            message:
+              type: "string"
+        correlationId:
+          type: "string"
+        statusCode:
+          type: "integer"
+        success:
+          type: "boolean"
+    DeleteCourseResponse:
+      type: "object"
+      properties:
+        body:
+          type: "object"
+          properties:
+            message:
+              type: "string"
+        correlationId:
+          type: "string"
+        statusCode:
+          type: "integer"
+        success:
+          type: "boolean"
+    GetCourseResponse:
+      type: "object"
+      properties:
+        body:
+          type: "object"
+          properties:
+            catalogId:
+              type: "integer"
+            id:
+              type: "integer"
+            courseType:
+              type: "string"
+            courseCode:
+              type: "string"
+            courseTitle:
+              type: "string"
+            courseDescription:
+              type: "string"
+            courseCategory:
+              type: "integer"
+            courseNavigationPolicy:
+              type: "integer"
+            selfUnenrollment:
+              type: "integer"
+            maxNumberOfAttempts:
+              type: "string"
+            showCourse:
+              type: "integer"
+            maxSubscriptionQuota:
+              type: "integer"
+            waitingList:
+              type: "integer"
+            demoMaterial:
+              type: "string"
+            courseSubscription:
+              type: "integer"
+            enrollmentPolicy:
+              type: "integer"
+            startDate:
+              type: "string"
+            endDate:
+              type: "string"
+            numberOfDaysValid:
+              type: "integer"
+            validity:
+              type: "string"
+            courseAutoPlay:
+              type: "integer"
+            courseInitialScoreCalculation:
+              type: "integer"
+            courseFinalScoreCalculation:
+              type: "integer"
+            price:
+              type: "integer"
+            instructors:
+              type: "array"
+              items:
+                type: "string"
+            image:
+              type: "string"
+            sessionList:
+              type: "array"
+              items:
+                type: "string"
+            isPublished:
+              type: "boolean"
+            onSale:
+              type: "boolean"
+            object:
+              properties:
+                courseObjectives:
+                  type: "string"
+                prerequisitesList:
+                  type: "string"
+                advancedPreparations:
+                  type: "string"
+                targetAudience:
+                  type: "string"
+                majorTopics:
+                  type: "string"
+                level:
+                  type: "string"
+              additionalProperties:
+                type: "string"
+            success:
+              type: "boolean"
+        correlationId:
+          type: "string"
+        statusCode:
+          type: "integer"
+        success:
+          type: "boolean"
+    GetCourseListResponse:
+      type: "object"
+      properties:
+        body:
+          type: "array"
+          items:
+            type: "object"
+            properties:
+              id:
+                type: "string"
+              null:
+                type: "string"
+              Title:
+                type: "string"
+              description:
+                type: "string"
+              thumbnailImage:
+                type: "string"
+              startdate:
+                type: "string"
+              enddate:
+                type: "string"
+              language:
+                type: "string"
+              duration:
+                type: "string"
+              courseType:
+                type: "string"
+              object:
+                type: "array"
+                items:
+                  type: "string"
+              success:
+                type: "boolean"
+        correlationId:
+          type: "string"
+        statusCode:
+          type: "integer"
+        success:
+          type: "boolean"
+    GetBranchListResponse:
       type: object
       properties:
         success:
@@ -1072,137 +1922,7 @@ components:
                 type: string
         statusCode:
           type: integer
-    UserResponseBody:
-      type: object
-      properties:
-        Office:
-          type: string
-        lastName:
-          type: string
-        Professional Level:
-          type: string
-        Account Number:
-          type: string
-        Firm ID:
-          type: string
-        Hire Date:
-          type: string
-        Employee / Contractor ID:
-          type: string
-        uuid:
-          type: string
-        valid:
-          type: string
-        Special Dietary Requirements:
-          type: string
-        Department:
-          type: string
-        Billing City:
-          type: string
-        Billing Address:
-          type: string
-        Team:
-          type: string
-        id:
-          type: string
-        Billing State / Province:
-          type: string
-        "IRS PTIN (e.g., P12345678)":
-          type: string
-        Internal Custom:
-          type: string
-        email:
-          type: string
-        "CTEC No. (e.g., A123456)":
-          type: string
-        Notes:
-          type: string
-        Accreditation & Compliance Edit Rights:
-          type: string
-        Rehire Date:
-          type: string
-        Designation:
-          type: string
-        TRID User:
-          type: string
-        OnvioUK Products:
-          type: string
-        Additional Sponsors:
-          type: string
-        level:
-          type: string
-        Position:
-          type: string
-        Referred By:
-          type: string
-        "CFP No. (e.g., 12345)":
-          type: string
-        Company / Organisation Name:
-          type: string
-        Billing Country:
-          type: string
-        branches:
-          type: array
-          items:
-            type: object
-            properties:
-              code:
-                type: string
-              level:
-                type: integer
-              hasChildren:
-                type: boolean
-              id:
-                type: integer
-              title:
-                type: string
-        Product Family:
-          type: string
-        Industry / Practice Group:
-          type: string
-        Termination Date:
-          type: string
-        firstName:
-          type: string
-        Billing Postal Code:
-          type: string
-        TaxPro Products:
-          type: string
-        Managed By:
-          type: string
-        Phone Number:
-          type: string
-        username:
-          type: string
-        Company Type:
-          type: string
-        Location:
-          type: string
-    User200Response:
-      type: object
-      properties:
-        success:
-          type: boolean
-        correlationId:
-          type: string
-        body:
-          $ref: "#/components/schemas/UserResponseBody"
-        statusCode:
-          type: integer
-    UserList200Response:
-      type: object
-      properties:
-        success:
-          type: boolean
-        correlationId:
-          type: string
-        body:
-          type: array
-          items:
-            $ref: "#/components/schemas/UserResponseBody"
-        statusCode:
-          type: integer
-    CatalogsGet200Response:
+    GetCatalogListResponse:
       type: object
       properties:
         success:
@@ -1261,69 +1981,7 @@ components:
                 type: integer
         statusCode:
           type: integer
-    Course200Response:
-      type: object
-      properties:
-        success:
-          type: boolean
-        correlationId:
-          type: string
-        body:
-          type: object
-          properties:
-            selfUnenrollment:
-              type: integer
-            courseType:
-              type: string
-            endDate:
-              type: string
-            Course Objectives:
-              type: string
-            courseCode:
-              type: string
-            courseAutoPlay:
-              type: integer
-            Major Topics:
-              type: string
-            courseCategory:
-              type: integer
-            courseTitle:
-              type: string
-            Prerequisites:
-              type: string
-            Program Format:
-              type: string
-            catalogId:
-              type: integer
-            demoMaterial:
-              type: string
-            image:
-              type: string
-            enrollmentPolicy:
-              type: integer
-            price:
-              type: integer
-            Target Audience:
-              type: string
-            onSale:
-              type: boolean
-            id:
-              type: integer
-            waitingList:
-              type: integer
-            isPublished:
-              type: boolean
-            courseDescription:
-              type: string
-            Advanced Preparation:
-              type: string
-            Program Level:
-              type: string
-            startDate:
-              type: string
-        statusCode:
-          type: integer
-    EnrollmentPut200Response:
+    PassUserResponse:
       type: object
       properties:
         success:
@@ -1461,7 +2119,7 @@ components:
               type: string
         statusCode:
           type: integer
-    EnrollmentPost200Response:
+    EnrollUserResponse:
       type: object
       properties:
         success:
@@ -1477,6 +2135,8 @@ components:
               type: string
         statusCode:
           type: integer
+    # Generic Responses
+    # ========================
     OptimusErrorResponse:
       type: object
       properties:
@@ -1526,12 +2186,13 @@ components:
                     type: string
         statusCode:
           type: integer
+
   securitySchemes:
     OAuth2:
       type: oauth2
       flows:
         clientCredentials:
-          tokenUrl: "https://api-prod.thomsonreuters.com/tr-oauth/v1/token"
+          tokenUrl: "https://api-dev.thomsonreuters.com/tr-oauth/v1/token"
           scopes:
             "write:lms": modify lms in your account
             "read:lms": read your lms
