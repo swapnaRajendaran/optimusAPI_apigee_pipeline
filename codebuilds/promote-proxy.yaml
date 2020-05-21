@@ -1,6 +1,6 @@
 version: 0.2
 env:
-  secrets-manager:
+  variables:
     # use the name of your secrets manager in the codepipline.yaml
     # For example a202210-codepipeline-tutorial-secrets-manager/secrets
    ARTIFACTORY_REGISTRY_AUTH: NjAxODQ4MTpBS0NwNWVtUk4zTmtIQXJZZkhQd2VvWUFablcyS0JEcVdwTkJ0Qm1MMzhMUmdxSlIzZ28yRG5YcDZ1TkhBakw0aWtxNm4zNHBL
