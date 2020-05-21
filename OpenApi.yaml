@@ -29,7 +29,11 @@ x-tr-servers:
         host: lmc05olut3.execute-api.us-east-1.amazonaws.com
         port: 443
         ssl: "true"
-      sat:
+      uat:
+        host: lmc05olut3.execute-api.us-east-1.amazonaws.com
+        port: 443
+        ssl: "true"
+      trexternal:
         host: lmc05olut3.execute-api.us-east-1.amazonaws.com
         port: 443
         ssl: "true"
