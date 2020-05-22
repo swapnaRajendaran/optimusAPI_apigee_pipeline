@@ -4,7 +4,7 @@ info:
   description: APIs contains set of LMS endpoints which can be used by external clients as well for internal use.
   version: 1.0.0
 servers:
-  - url: "https://api-dev.thomsonreuters.com/trlearning/v1"
+  - url: "https://api-prod.thomsonreuters.com/trlearning/v1"
 x-tr-proxy-name: Learning
 x-tr-asset-insight-id: "202209"
 x-tr-deploy-permissions:
@@ -29,11 +29,7 @@ x-tr-servers:
         host: lmc05olut3.execute-api.us-east-1.amazonaws.com
         port: 443
         ssl: "true"
-      uat:
-        host: lmc05olut3.execute-api.us-east-1.amazonaws.com
-        port: 443
-        ssl: "true"
-      trexternal:
+      sat:
         host: lmc05olut3.execute-api.us-east-1.amazonaws.com
         port: 443
         ssl: "true"
@@ -176,6 +172,12 @@ paths:
         "404":
           description: Not Found
           content: {}
+        "406":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InvalidParameterResponse"
         "500":
           description: Server Error
           content:
@@ -633,57 +635,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/EnrollUserResponse"
-        "401":
-          description: Invalid credentials
-          content: {}
-        "403":
-          description: Permission denied
-          content: {}
-        "404":
-          description: Not Found
-          content: {}
-        "406":
-          description: Invalid input
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/InvalidParameterResponse"
-        "500":
-          description: Server Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/OptimusErrorResponse"
-      security:
-        - OAuth2:
-            - "write:lms"
-            - "read:lms"
-    put:
-      tags:
-        - enrollments
-      summary: Updates user status for a particular course
-      description: Updates a course status for a given course id and user id
-      operationId: UpdateEnrollUser
-      parameters:
-        - name: userId
-          in: path
-          description: ID of user to enroll
-          schema:
-            type: integer
-            format: int64
-          required: true
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/PassUserRequest"
-      responses:
-        "200":
-          description: success
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/PassUserResponse"
         "401":
           description: Invalid credentials
           content: {}
@@ -1184,8 +1135,7 @@ components:
         - "courseType"
         - "courseTitle"
         - "courseDescription"
-      additionalProperties:
-        type: "string"
+        - "isPublished"
     UpdateCourseRequest:
       type: "object"
       properties:
@@ -1293,8 +1243,17 @@ components:
       type: "object"
       properties:
         courseIds:
-          type: "object"
+          type: "array"
+          items:
+            type: "number"
         level:
+          type: "string"
+          enum:
+            - "COACH"
+            - "STUDENT"
+            - "INSTRUCTOR"
+            - "TUTOR"
+        enrollmentStatus:
           type: "string"
           enum:
             - "WAITING_LIST"
@@ -1308,6 +1267,7 @@ components:
         enrollmentFields:
           type: "object"
       required:
+        - "courseIds"
         - "level"
     AddLocationRequest:
       type: "object"
@@ -1461,7 +1421,6 @@ components:
       required:
         - "sessionName"
         - "maximumEnrollments"
-        
     # Responses
     # ========================
     AddWebinarSessionResponse:
@@ -2190,13 +2149,12 @@ components:
                     type: string
         statusCode:
           type: integer
-
   securitySchemes:
     OAuth2:
       type: oauth2
       flows:
         clientCredentials:
-          tokenUrl: "https://api-dev.thomsonreuters.com/tr-oauth/v1/token"
+          tokenUrl: "https://api-prod.thomsonreuters.com/tr-oauth/v1/token"
           scopes:
             "write:lms": modify lms in your account
             "read:lms": read your lms
