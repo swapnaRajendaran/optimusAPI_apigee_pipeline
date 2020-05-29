@@ -38,7 +38,7 @@ x-tr-servers:
         port: 443
         ssl: "true"
    
-    basePath: /green
+    basePath: /blue
 tags:
   - name: user
     description: LMS user
