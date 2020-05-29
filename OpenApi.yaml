@@ -37,7 +37,8 @@ x-tr-servers:
         host: bbiuc3kmz4.execute-api.us-east-1.amazonaws.com
         port: 443
         ssl: "true"
-    basePath: /blue
+   
+    basePath: /green
 tags:
   - name: user
     description: LMS user
@@ -53,6 +54,10 @@ tags:
     description: LMS locations
   - name: sessions
     description: LMS sessions
+  - name: additionalFields
+    description: LMS additionalFields
+  - name: learningplan
+    description: LMS learning plans
 paths:
   /users:
     get:
@@ -530,6 +535,51 @@ paths:
         - OAuth2:
             - "write:lms"
             - "read:lms"
+  "/courses/learningPlan/{learningPlanId}":
+    get:
+      tags:
+        - course
+      summary: Finds course list by learning plan id
+      description: Fetch course info based on learning plan id provided
+      operationId: GetCourseListbyLearningPlanId
+      parameters:
+        - name: learningPlanId
+          in: path
+          schema:
+            type: integer
+          required: true
+      responses:
+        "200":
+          description: Auto generated using Swagger Inspector
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetCourseListByLearningPlanResponse"
+        "401":
+          description: Invalid credentials
+          content: {}
+        "403":
+          description: Permission denied
+          content: {}
+        "404":
+          description: Not Found
+          content: {}
+        "406":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InvalidParameterResponse"
+        "500":
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OptimusErrorResponse"
+      security:
+        - OAuth2:
+            - "write:lms"
+            - "read:lms"
   /branches:
     get:
       tags:
@@ -639,6 +689,57 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/EnrollUserResponse"
+        "401":
+          description: Invalid credentials
+          content: {}
+        "403":
+          description: Permission denied
+          content: {}
+        "404":
+          description: Not Found
+          content: {}
+        "406":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InvalidParameterResponse"
+        "500":
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OptimusErrorResponse"
+      security:
+        - OAuth2:
+            - "write:lms"
+            - "read:lms"
+    put:
+      tags:
+        - enrollments
+      summary: Updates user status for a particular course
+      description: Updates a course status for a given course id and user id
+      operationId: UpdateEnrollUser
+      parameters:
+        - name: userId
+          in: path
+          description: ID of user to enroll
+          schema:
+            type: integer
+            format: int64
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PassUserRequest"
+      responses:
+        "200":
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PassUserResponse"
         "401":
           description: Invalid credentials
           content: {}
@@ -954,6 +1055,331 @@ paths:
         - OAuth2:
             - "write:lms"
             - "read:lms"
+  /learningPlan:
+    get:
+      tags:
+        - learningplan
+      summary: Finds the list of learning plans
+      description: Fetches the list of learning plans for which the logged in User has access
+      operationId: GetLearningPlanList
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/GetLearningPlanListResponse"
+        "401":
+          description: Invalid credentials
+          content: {}
+        "403":
+          description: Permission denied
+          content: {}
+        "404":
+          description: Not Found
+          content: {}
+        "406":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InvalidParameterResponse"
+        "500":
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OptimusErrorResponse"
+      security:
+        - OAuth2:
+            - "write:lms"
+            - "read:lms"
+    post:
+      tags:
+        - learningplan
+      summary: Add new learning plan
+      description: New learning plan can be added within the catalog that the logged in user has access to
+      operationId: AddLearningPlan
+      requestBody:
+        description: New learning plan object can be added by the authorized user
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AddLearningPlanRequest"
+          multipart/form-data:
+              schema:
+                $ref: "#/components/schemas/LearningPlanMultipartPost"
+      responses:
+        "200":
+          description: created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AddLearningPlanResponse"
+        "401":
+            description: Invalid credentials
+            content: {}
+        "403":
+          description: Permission denied
+          content: {}
+        "404":
+          description: Not Found
+          content: {}
+        "406":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InvalidParameterResponse"
+        "500":
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OptimusErrorResponse"
+      security:
+        - OAuth2:
+            - "write:lms"
+            - "read:lms" 
+  "/learningPlan/{learningPlanId}":
+    get:
+      tags:
+        - learningplan
+      summary: Get learning plan by learning plan id
+      description: Fetch learning plan based on learning plan id provided
+      operationId: GetLearningPlan
+      parameters:
+        - name: learningPlanId
+          in: path
+          description: ID of learning plan to return
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetLearningPlanResponse"
+        "401":
+          description: Invalid credentials
+          content: {}
+        "403":
+          description: Permission denied
+          content: {}
+        "404":
+          description: Not Found
+          content: {}
+        "406":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InvalidParameterResponse"
+        "500":
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OptimusErrorResponse"
+      security:
+        - OAuth2:
+            - "write:lms"
+            - "read:lms"
+    put:
+      tags:
+        - learningplan
+      summary: Updates a learning plan
+      description: Updates a learning plan within the catalog that the logged in user has access to
+      operationId: UpdateLearningPlan
+      parameters:
+        - name: learningPlanId
+          in: path
+          description: ID of learning plan to return
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        description: Update learning plan object can be added by the authorized user
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateLearningPlanRequest"
+          multipart/form-data:
+              schema:
+                $ref: "#/components/schemas/LearningPlanMultipartPut"
+      responses:
+        "200":
+          description: updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdateLearningPlanResponse"
+        "401":
+            description: Invalid credentials
+            content: {}
+        "403":
+          description: Permission denied
+          content: {}
+        "404":
+          description: Not Found
+          content: {}
+        "406":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InvalidParameterResponse"
+        "500":
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OptimusErrorResponse"
+      security:
+        - OAuth2:
+            - "write:lms"
+            - "read:lms"  
+    delete:
+      tags:
+        - learningplan
+      summary: Deletes a learning plan based on the learning plan id
+      description: Deletes a learning plan by the learning plan id
+      operationId: DeleteLearningPlan
+      parameters:
+        - name: learningPlanId
+          in: path
+          description: ID of learning plan to delete
+          schema:
+            type: integer
+            format: int64
+          required: true
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DeleteLearningPlanResponse"
+        "401":
+          description: Invalid credentials
+          content: {}
+        "403":
+          description: Permission denied
+          content: {}
+        "404":
+          description: Not Found
+          content: {}
+        "406":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InvalidParameterResponse"
+        "500":
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OptimusErrorResponse"
+      security:
+        - OAuth2:
+            - "write:lms"
+            - "read:lms"
+  "/sessions/courses/{courseId}":
+    get:
+      tags:
+        - sessions
+      summary: Finds sessions by course id
+      description: Fetch session info based on course id provided. The logged in user must have access to catalog where the requested course id resides
+      operationId: GetSessionListByCourseId
+      parameters:
+        - name: courseId
+          in: path
+          schema:
+            type: integer
+          required: true
+      responses:
+        "200":
+          description: Auto generated using Swagger Inspector
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetCourseResponse"
+        "401":
+          description: Invalid credentials
+          content: {}
+        "403":
+          description: Permission denied
+          content: {}
+        "404":
+          description: Not Found
+          content: {}
+        "406":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InvalidParameterResponse"
+        "500":
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OptimusErrorResponse"
+      security:
+        - OAuth2:
+            - "write:lms"
+            - "read:lms"
+  "/additionalFields/{endpointName}":
+    get:
+      tags:
+        - additionalFields
+      summary: Finds the list of additional fields on a given endpoint
+      description: Fetch additional fields info based on endpoint provided.
+      operationId: GetAdditionalFieldsList
+      parameters:
+        - name: endpointName
+          description: type of additional fields to return, either users or courses
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        "200":
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GetAdditionalFieldsListResponse"
+        "401":
+          description: Invalid credentials
+          content: {}
+        "403":
+          description: Permission denied
+          content: {}
+        "404":
+          description: Not Found
+          content: {}
+        "406":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InvalidParameterResponse"
+        "500":
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OptimusErrorResponse"
+      security:
+        - OAuth2:
+            - "write:lms"
+            - "read:lms"
 components:
   schemas:
     # Requests
@@ -1238,14 +1664,6 @@ components:
       properties:
         courseId:
           type: "number"
-        enrollmentStatus:
-          type: "string"
-      required:
-        - "courseId"
-        - "enrollmentStatus"
-    EnrollUserRequest:
-      type: "object"
-      properties:
         courseIds:
           type: "array"
           items:
@@ -1270,9 +1688,35 @@ components:
           type: "number"
         enrollmentFields:
           type: "object"
-      required:
-        - "courseIds"
-        - "level"
+    EnrollUserRequest:
+      type: "object"
+      properties:
+        courseId:
+          type: "number"
+        courseIds:
+          type: "array"
+          items:
+            type: "number"
+        level:
+          type: "string"
+          enum:
+            - "COACH"
+            - "STUDENT"
+            - "INSTRUCTOR"
+            - "TUTOR"
+        enrollmentStatus:
+          type: "string"
+          enum:
+            - "WAITING_LIST"
+            - "SUBSCRIBED"
+            - "ENROLLED"
+            - "IN_PROGRESS"
+            - "COMPLETED"
+            - "SUSPEND"
+        sessionId:
+          type: "number"
+        enrollmentFields:
+          type: "object"
     AddLocationRequest:
       type: "object"
       properties:
@@ -1332,8 +1776,12 @@ components:
           type: "string"
         description:
           type: "string"
-        max_enroll:
+        maximumEnrollments:
           type: "number"
+        minimumEnrollments:
+          type: "number"
+        completion:
+          type: "string"
         dates:
           type: "array"
           items:
@@ -1345,41 +1793,35 @@ components:
                 type: "string"
               description:
                 type: "string"
-              time_begin:
+              timeBegin:
                 type: "string"
-              time_end:
+              timeEnd:
                 type: "string"
-              break_begin:
+              breakBegin:
                 type: "string"
-              break_end:
+              breakEnd:
                 type: "string"
               timezone:
                 type: "string"
               sessionDateDuration:
                 type: "number"
-              instructorjoin:
+              instructorJoin:
                 type: "string"
-              learnerjoin:
+              learnerJoin:
                 type: "string"
-              webinartool:
+              webinarTool:
                 type: "string"
               url:
                 type: "string"
-              oauthaccount:
+              oauthAccount:
                 type: "string"
             required:
               - "day"
               - "name"
               - "sessionDateDuration"
-        completion:
-          type: "string"
-        min_session:
-          type: "number"
-        record_accessed:
-          type: "boolean"
       required:
         - "name"
-        - "max_enroll"
+        - "maximumEnrollments"
         - "dates"
     AddClassroomSessionRequest:
       type: "object"
@@ -1425,6 +1867,72 @@ components:
       required:
         - "sessionName"
         - "maximumEnrollments"
+    AddLearningPlanRequest:
+      type: "object"
+      properties:
+        learningPlanName:
+          type: "string"
+        learningPlanDescription:
+          type: "string"
+        learningPlanCode:
+          type: "string"
+        addToCourseCatalog:
+          type: "boolean"
+        dayOfValidity:
+          type: "string"
+        channels:
+          type: "string"
+        certificate:
+          type: "string"
+        certificationAndRetraining:
+          type: "string"
+        enrollmentEnabled:
+          type: "boolean"
+      required:
+        - "learningPlanName"
+        - "learningPlanDescription"
+    UpdateLearningPlanRequest:
+      type: "object"
+      properties:
+        learningPlanName:
+          type: "string"
+        learningPlanDescription:
+          type: "string"
+        learningPlanCode:
+          type: "string"
+        addToCourseCatalog:
+          type: "boolean"
+        dayOfValidity:
+          type: "string"
+        channels:
+          type: "string"
+        certificate:
+          type: "string"
+        certificationAndRetraining:
+          type: "string"
+        credits:
+          type: "number"
+        enrollmentEnabled:
+          type: "boolean"
+      required:
+        - "learningPlanName"
+        - "learningPlanDescription"
+    LearningPlanMultipartPost:
+      type: object
+      properties:
+        body:
+          $ref: "#/components/schemas/AddLearningPlanRequest"
+        image:
+          type: string
+          format: binary
+    LearningPlanMultipartPut:
+      type: object
+      properties:
+        body:
+          $ref: "#/components/schemas/UpdateLearningPlanRequest"
+        image:
+          type: string
+          format: binary
     # Responses
     # ========================
     AddWebinarSessionResponse:
@@ -1741,6 +2249,10 @@ components:
           properties:
             catalogId:
               type: "integer"
+            catalogIds:
+              type: "array"
+              items:
+                type: "number"
             id:
               type: "integer"
             courseType:
@@ -1817,8 +2329,6 @@ components:
                   type: "string"
               additionalProperties:
                 type: "string"
-            success:
-              type: "boolean"
         correlationId:
           type: "string"
         statusCode:
@@ -2100,6 +2610,158 @@ components:
               type: string
             errors:
               type: string
+        statusCode:
+          type: integer
+    GetLearningPlanListResponse:
+      type: "object"
+      properties:
+        body:
+          type: "array"
+          items:
+            type: "object"
+            properties:
+              learningPlanId:
+                type: "string"
+              learningPlanName:
+                type: "string"
+              learningPlanAccessLevel:
+                type: "string"
+        correlationId:
+          type: "string"
+        statusCode:
+          type: "integer"
+        success:
+          type: "boolean"
+    AddLearningPlanResponse:
+      type: "object"
+      properties:
+        body:
+          type: "object"
+          properties:
+            id:
+              type: "string"
+            message:
+              type: "string"
+        correlationId:
+          type: "string"
+        statusCode:
+          type: "integer"
+        success:
+          type: "boolean"
+    GetLearningPlanResponse:
+      type: "object"
+      properties:
+        body:
+          type: "object"
+          properties:
+            learningPlanName:
+              type: "string"
+            learningPlanAccessLevel:
+              type: "string"
+            courses:
+              type: "array"
+              items:
+                type: "object"
+                properties:
+                  courseName:
+                    type: "string"
+                  courseCode:
+                    type: "string"
+                  mandatoryOrOptional:
+                    type: "string"
+                  courseType:
+                    type: "string"
+                  prerequisiteCourses:
+                    type: "string"
+            success:
+              type: "boolean"
+        correlationId:
+          type: "string"
+        statusCode:
+          type: "integer"
+        success:
+          type: "boolean"
+    GetCourseListByLearningPlanResponse:
+      type: "object"
+      properties:
+        body:
+          type: "array"
+          items:
+            type: "object"
+            properties:
+              courseName:
+                type: "string"
+              courseCode:
+                type: "string"
+              mandatoryOrOptional:
+                type: "string"
+              courseType:
+                type: "string"
+              prerequisiteCourses:
+                type: "string"
+        correlationId:
+          type: "string"
+        statusCode:
+          type: "integer"
+        success:
+          type: "boolean"
+    DeleteLearningPlanResponse:
+      type: "object"
+      properties:
+        body:
+          type: "object"
+          properties:
+            message:
+              type: "string"
+        correlationId:
+          type: "string"
+        statusCode:
+          type: "integer"
+        success:
+          type: "boolean"
+    UpdateLearningPlanResponse:
+      type: "object"
+      properties:
+        body:
+          type: "object"
+          properties:
+            message:
+              type: "string"
+        correlationId:
+          type: "string"
+        statusCode:
+          type: "integer"
+        success:
+          type: "boolean"
+    GetAdditionalFieldsListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        correlationId:
+          type: string
+        body:
+          type: array
+          items:
+            type: object
+            properties:
+              title:
+                type: string
+              type:
+                type: string
+              mandatory:
+                type: boolean
+              options:
+                type: array
+                items:
+                  type: "object"
+                  properties:
+                    id:
+                      type: integer
+                    label:
+                      type: string
+              invisibleToUser:
+                type: boolean
         statusCode:
           type: integer
     # Generic Responses
