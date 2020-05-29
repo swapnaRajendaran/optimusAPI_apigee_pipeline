@@ -39,6 +39,7 @@ x-tr-servers:
         ssl: "true"
    
     basePath: /blue
+
 tags:
   - name: user
     description: LMS user
@@ -436,59 +437,59 @@ paths:
         - OAuth2:
             - "write:lms"
             - "read:lms"
-    put:
-      parameters:
-        - name: courseId
-          in: path
-          schema:
-            type: integer
-            format: int64
-          required: true
-      tags:
-        - course
-      summary: update course by course id
-      description: Update course info for the course id provided. The logged in user must have access to the catalog where the requested course   id resides
-      operationId: UpdateCourseByCourseId
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/UpdateCourseRequest"
-          multipart/form-data:
-              schema:
-                $ref: "#/components/schemas/CourseMultipartPut"
-      responses:
-        "200":
-          description: Success
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/UpdateCourseResponse"
-        "401":
-          description: Invalid credentials
-          content: {}
-        "403":
-          description: Permission denied
-          content: {}
-        "404":
-          description: Not Found
-          content: {}
-        "406":
-          description: Invalid input
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/InvalidParameterResponse"
-        "500":
-          description: Server Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/OptimusErrorResponse"
-      security:
-        - OAuth2:
-            - "write:lms"
-            - "read:lms"
+    # put:
+    #   parameters:
+    #     - name: courseId
+    #       in: path
+    #       schema:
+    #         type: integer
+    #         format: int64
+    #       required: true
+    #   tags:
+    #     - course
+    #   summary: update course by course id
+    #   description: Update course info for the course id provided. The logged in user must have access to the catalog where the requested course   id resides
+    #   operationId: UpdateCourseByCourseId
+    #   requestBody:
+    #     content:
+    #       application/json:
+    #         schema:
+    #           $ref: "#/components/schemas/UpdateCourseRequest"
+    #       multipart/form-data:
+    #           schema:
+    #             $ref: "#/components/schemas/CourseMultipartPut"
+    #   responses:
+    #     "200":
+    #       description: Success
+    #       content:
+    #         application/json:
+    #           schema:
+    #             $ref: "#/components/schemas/UpdateCourseResponse"
+    #     "401":
+    #       description: Invalid credentials
+    #       content: {}
+    #     "403":
+    #       description: Permission denied
+    #       content: {}
+    #     "404":
+    #       description: Not Found
+    #       content: {}
+    #     "406":
+    #       description: Invalid input
+    #       content:
+    #         application/json:
+    #           schema:
+    #             $ref: "#/components/schemas/InvalidParameterResponse"
+    #     "500":
+    #       description: Server Error
+    #       content:
+    #         application/json:
+    #           schema:
+    #             $ref: "#/components/schemas/OptimusErrorResponse"
+    #   security:
+    #     - OAuth2:
+    #         - "write:lms"
+    #         - "read:lms"
     delete:
       tags:
         - course
@@ -2764,6 +2765,143 @@ components:
                 type: boolean
         statusCode:
           type: integer
+    GetEnrollmentListByUserResponse:
+      type: "object"
+      properties:
+        body:
+          type: "array"
+          items:
+            type: "object"
+            properties:
+              id:
+                type: "integer"
+              courseType:
+                type: "string"
+              enrollDate:
+                type: "string"
+              completionDate:
+                type: "string"
+              endDate:
+                type: "string"
+              enrollmentStatus:
+                type: "string"
+              sessionList:
+                type: "array"
+                items:
+                  type: "object"
+                  properties:
+                    sessionId:
+                      type: "string"
+                    sessionName:
+                      type: "string"
+                    startDate:
+                      type: "string"
+                    endDate:
+                      type: "string"
+                    status:
+                      type: "string"
+                    dates:
+                      type: "array"
+                      items:
+                        type: "object"
+                        properties:
+                          day:
+                            type: "string"
+                          sessionDayName:
+                            type: "string"
+                          timeBegin:
+                            type: "string"
+                          timeEnd:
+                            type: "string"
+                          breakBegin:
+                            type: "string"
+                          breakEnd:
+                            type: "string"
+                          timezone:
+                            type: "string"
+                          locationId:
+                            type: "integer"
+                          classroomId:
+                            type: "integer"
+                          classroomName:
+                            type: "integer"
+                          attendanceStatus:
+                            type: "string"
+                    locations:
+                      type: "array"
+                      items:
+                        type: "object"
+                        properties:
+                          id:
+                            type: "integer"
+                          locationName:
+                            type: "string"
+                          address:
+                            type: "string"
+                          countryId:
+                            type: "string"
+                          country:
+                            type: "string"
+                          countryCode:
+                            type: "string"
+                          zoneId:
+                            type: "string"
+                          locationPhoneNumber:
+                            type: "string"
+                          locationEmail:
+                            type: "string"
+                          directions:
+                            type: "string"
+                          suggestedAccomodations:
+                            type: "string"
+                          otherInfo:
+                            type: "string"
+                    minimumEnrollment:
+                      type: "string"
+                    sessionUid:
+                      type: "string"
+                    slugName:
+                      type: "string"
+                    description:
+                      type: "string"
+                    evaluationType:
+                      type: "string"
+                    additionalFields:
+                      type: "array"
+                      items:
+                        type: "object"
+                    maximumEnrollment:
+                      type: "string"
+                    lastSubscriptionDate:
+                      type: "string"
+                    enrolled:
+                      properties:
+                        countInstructor:
+                          type: "string"
+                        countInstructorWaitlist:
+                          type: "string"
+                        countTutor:
+                          type: "string"
+                        countTutorWaitlist:
+                          type: "string"
+                        countLearner:
+                          type: "string"
+                        countLearnerWaitlist:
+                          type: "string"
+                        isEnrolled:
+                          type: "string"
+                        countEnrolled:
+                          type: "string"
+                        status:
+                          type: "string"
+                        canEnrollSession:
+                          type: "string"
+        correlationId:
+          type: "string"
+        statusCode:
+          type: "integer"
+        success:
+          type: "boolean"
     # Generic Responses
     # ========================
     OptimusErrorResponse:
