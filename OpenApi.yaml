@@ -1098,6 +1098,7 @@ paths:
         - OAuth2:
             - "write:lms"
             - "read:lms"
+  "/courses/{courseId}/webinarsessions/{sessionId}":
     put:
       tags:
         - sessions
@@ -1106,6 +1107,12 @@ paths:
       operationId: UpdateWebinarSession
       parameters:
         - name: courseId
+          in: path
+          schema:
+            type: integer
+            format: int64
+          required: true
+        - name: sessionId
           in: path
           schema:
             type: integer
@@ -1155,6 +1162,63 @@ paths:
       summary: Adds a classroom session for a particular course
       description: Adds a classroom session for a given course id
       operationId: AddClassroomSession
+      parameters:
+        - name: courseId
+          in: path
+          schema:
+            type: integer
+            format: int64
+          required: true
+        - name: sessionId
+          in: path
+          schema:
+            type: integer
+            format: int64
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AddClassroomSessionRequest"
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AddClassroomSessionResponse"
+        "401":
+          description: Invalid credentials
+          content: {}
+        "403":
+          description: Permission denied
+          content: {}
+        "404":
+          description: Not Found
+          content: {}
+        "406":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InvalidParameterResponse"
+        "500":
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OptimusErrorResponse"
+      security:
+        - OAuth2:
+            - "write:lms"
+            - "read:lms"
+  "/courses/{courseId}/classroomsessions/{sessionId}":
+    put:
+      tags:
+        - sessions
+      summary: Updates a classroom session for a particular course
+      description: Updates a classroom session for a given course id
+      operationId: UpdateClassroomSession
       parameters:
         - name: courseId
           in: path
@@ -1240,53 +1304,6 @@ paths:
         - OAuth2:
             - "write:lms"
             - "read:lms"
-    post:
-      tags:
-        - learningplan
-      summary: Add new learning plan
-      description: New learning plan can be added within the catalog that the logged in user has access to
-      operationId: AddLearningPlan
-      requestBody:
-        description: New learning plan object can be added by the authorized user
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/AddLearningPlanRequest"
-          multipart/form-data:
-              schema:
-                $ref: "#/components/schemas/LearningPlanMultipartPost"
-      responses:
-        "200":
-          description: created successfully
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AddLearningPlanResponse"
-        "401":
-            description: Invalid credentials
-            content: {}
-        "403":
-          description: Permission denied
-          content: {}
-        "404":
-          description: Not Found
-          content: {}
-        "406":
-          description: Invalid input
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/InvalidParameterResponse"
-        "500":
-          description: Server Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/OptimusErrorResponse"
-      security:
-        - OAuth2:
-            - "write:lms"
-            - "read:lms" 
   "/learningPlan/{learningPlanId}":
     get:
       tags:
@@ -1333,60 +1350,6 @@ paths:
         - OAuth2:
             - "write:lms"
             - "read:lms"
-    put:
-      tags:
-        - learningplan
-      summary: Updates a learning plan
-      description: Updates a learning plan within the catalog that the logged in user has access to
-      operationId: UpdateLearningPlan
-      parameters:
-        - name: learningPlanId
-          in: path
-          description: ID of learning plan to return
-          required: true
-          schema:
-            type: integer
-      requestBody:
-        description: Update learning plan object can be added by the authorized user
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/UpdateLearningPlanRequest"
-          multipart/form-data:
-              schema:
-                $ref: "#/components/schemas/LearningPlanMultipartPut"
-      responses:
-        "200":
-          description: updated successfully
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/UpdateLearningPlanResponse"
-        "401":
-            description: Invalid credentials
-            content: {}
-        "403":
-          description: Permission denied
-          content: {}
-        "404":
-          description: Not Found
-          content: {}
-        "406":
-          description: Invalid input
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/InvalidParameterResponse"
-        "500":
-          description: Server Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/OptimusErrorResponse"
-      security:
-        - OAuth2:
-            - "write:lms"
-            - "read:lms"  
     delete:
       tags:
         - learningplan
@@ -1433,6 +1396,50 @@ paths:
         - OAuth2:
             - "write:lms"
             - "read:lms"
+  "/learningPlan/enroll":
+    post:
+      tags:
+        - learningplan
+      summary: Subscribe to a learning plan
+      description: Subscribe to a learning plan
+      operationId: SubscribeToLearningPlan
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SubscribeToLearningPlanRequest"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SubscribeToLearningPlanResponse"
+        "401":
+          description: Invalid credentials
+          content: {}
+        "403":
+          description: Permission denied
+          content: {}
+        "404":
+          description: Not Found
+          content: {}
+        "406":
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InvalidParameterResponse"
+        "500":
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OptimusErrorResponse"
+      security:
+        - OAuth2:
+            - "write:lms"
+            - "read:lms"
   "/courses/{courseId}/sessions":
     get:
       tags:
@@ -1452,7 +1459,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GetCourseResponse"
+                $ref: "#/components/schemas/GetSessionListResponse"
         "401":
           description: Invalid credentials
           content: {}
@@ -1670,12 +1677,9 @@ components:
           type: "number"
         courseAutoPlay:
           type: "number"
-        courseInitialScoreCalculation:
-          type: "number"
-        courseFinalScoreCalculation:
-          type: "number"
         prerequisitesList:
           type: "string"
+          description: "Navigation policy: either 1 (Free Learning path), 2 (Sequential Learning path), 3 (Final Test) or 4 (Pre Test). 2,3 and 4 are allowed only for elearning courses, while 1 or no parameter at all is allowed also for classroom and webinar"
         advancedPreparations:
           type: "string"
         targetAudience:
@@ -1705,8 +1709,6 @@ components:
     UpdateCourseRequest:
       type: "object"
       properties:
-        catalogId:
-          type: "number"
         catalogIds:
           type: "array"
           items:
@@ -1755,12 +1757,9 @@ components:
           type: "number"
         courseAutoPlay:
           type: "number"
-        courseInitialScoreCalculation:
-          type: "number"
-        courseFinalScoreCalculation:
-          type: "number"
         prerequisitesList:
           type: "string"
+          description: "Navigation policy: either 1 (Free Learning path), 2 (Sequential Learning path), 3 (Final Test) or 4 (Pre Test). 2,3 and 4 are allowed only for elearning courses, while 1 or no parameter at all is allowed also for classroom and webinar"
         advancedPreparations:
           type: "string"
         targetAudience:
@@ -1842,19 +1841,12 @@ components:
             - "STUDENT"
             - "INSTRUCTOR"
             - "TUTOR"
-        enrollmentStatus:
-          type: "string"
-          enum:
-            - "WAITING_LIST"
-            - "SUBSCRIBED"
-            - "ENROLLED"
-            - "IN_PROGRESS"
-            - "COMPLETED"
-            - "SUSPEND"
         sessionId:
           type: "number"
         enrollmentFields:
           type: "object"
+      required:
+        - "level"
     AddLocationRequest:
       type: "object"
       properties:
@@ -1931,17 +1923,21 @@ components:
                 type: "string"
               description:
                 type: "string"
-              timeBegin:
+              startHour:
                 type: "string"
-              timeEnd:
+                pattern: "^([0-1][0-9]|2[0-3]):([0-5][0-9])$"
+              endHour:
                 type: "string"
+                pattern: "^([0-1][0-9]|2[0-3]):([0-5][0-9])$"
               breakBegin:
                 type: "string"
+                pattern: "^([0-1][0-9]|2[0-3]):([0-5][0-9])$"
               breakEnd:
                 type: "string"
+                pattern: "^([0-1][0-9]|2[0-3]):([0-5][0-9])$"
               timezone:
                 type: "string"
-              sessionDateDuration:
+              duration:
                 type: "number"
               instructorJoin:
                 type: "string"
@@ -1956,7 +1952,7 @@ components:
             required:
               - "day"
               - "name"
-              - "sessionDateDuration"
+              - "duration"
       required:
         - "name"
         - "maximumEnrollments"
@@ -1983,14 +1979,18 @@ components:
                 type: "string"
               sessionDayName:
                 type: "string"
-              timeBegin:
+              startHour:
                 type: "string"
-              timeEnd:
+                pattern: "^([0-1][0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])$"
+              endHour:
                 type: "string"
+                pattern: "^([0-1][0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])$"
               breakBegin:
                 type: "string"
+                pattern: "^([0-1][0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])$"
               breakEnd:
                 type: "string"
+                pattern: "^([0-1][0-9]|2[0-3]):([0-5][0-9]):([0-5][0-9])$"
               timezone:
                 type: "string"
               locationId:
@@ -1999,8 +1999,8 @@ components:
                 type: "number"
             required:
               - "day"
-              - "timeBegin"
-              - "timeEnd"
+              - "startHour"
+              - "endHour"
               - "locationId"
       required:
         - "sessionName"
@@ -2029,6 +2029,18 @@ components:
       required:
         - "learningPlanName"
         - "learningPlanDescription"
+    SubscribeToLearningPlanRequest:
+      type: "object"
+      properties:
+        userId:
+          type: "number"
+        learningPlanId:
+          type: "number"
+        waiting:
+          type: "boolean"
+      required:
+        - "userId"
+        - "learningPlanId"
     UpdateLearningPlanRequest:
       type: "object"
       properties:
@@ -2493,10 +2505,6 @@ components:
               type: "string"
             courseAutoPlay:
               type: "integer"
-            courseInitialScoreCalculation:
-              type: "integer"
-            courseFinalScoreCalculation:
-              type: "integer"
             price:
               type: "integer"
             instructors:
@@ -2508,7 +2516,69 @@ components:
             sessionList:
               type: "array"
               items:
-                type: "string"
+                type: "object"
+                properties:
+                  sessionId:
+                    type: "string"
+                  sessionName:
+                    type: "string"
+                  sessionCode:
+                    type: "string"
+                  description:
+                    type: "string"
+                  maximumEnrollment:
+                    type: "string"
+                  minimumEnrollment:
+                    type: "string"
+                  lastSubscriptionDate:
+                    type: "string"
+                  minimumEnrollments:
+                    type: "string"
+                  startDate:
+                    type: "string"
+                  endDate:
+                    type: "string"
+                  status:
+                    type: "string"
+                  dates:
+                    type: "array"
+                    items:
+                      type: "object"
+                      properties:
+                        day:
+                          type: "string"
+                        sessionDayName:
+                          type: "string"
+                        startHour:
+                          type: "string"
+                        endHour:
+                          type: "string"
+                        breakBegin:
+                          type: "string"
+                        breakEnd:
+                          type: "string"
+                        timezone:
+                          type: "string"
+                        locationId:
+                          type: "integer"
+                        classroomId:
+                          type: "integer"
+                        classroomName:
+                          type: "integer"
+                        attendanceStatus:
+                          type: "string"
+                        instructorJoin:
+                          type: "string"
+                        learnerJoin:
+                          type: "string"
+                        oauthAccount:
+                          type: "string"
+                        duration:
+                          type: "number"
+                        url:
+                          type: "string"
+                        webinarTool:
+                          type: "string"
             isPublished:
               type: "boolean"
             onSale:
@@ -2532,6 +2602,81 @@ components:
                   type: "string"
               additionalProperties:
                 type: "string"
+        correlationId:
+          type: "string"
+        statusCode:
+          type: "integer"
+        success:
+          type: "boolean"
+    GetSessionListResponse:
+      type: "object"
+      properties:
+        body:
+          type: "array"
+          items:
+            type: "object"
+            properties:
+              sessionId:
+                type: "string"
+              sessionName:
+                type: "string"
+              sessionCode:
+                type: "string"
+              description:
+                type: "string"
+              maximumEnrollment:
+                type: "string"
+              minimumEnrollment:
+                type: "string"
+              lastSubscriptionDate:
+                type: "string"
+              minimumEnrollments:
+                type: "string"
+              startDate:
+                type: "string"
+              endDate:
+                type: "string"
+              status:
+                type: "string"
+              dates:
+                type: "array"
+                items:
+                  type: "object"
+                  properties:
+                    day:
+                      type: "string"
+                    sessionDayName:
+                      type: "string"
+                    startHour:
+                      type: "string"
+                    endHour:
+                      type: "string"
+                    breakBegin:
+                      type: "string"
+                    breakEnd:
+                      type: "string"
+                    timezone:
+                      type: "string"
+                    locationId:
+                      type: "integer"
+                    classroomId:
+                      type: "integer"
+                    classroomName:
+                      type: "integer"
+                    attendanceStatus:
+                      type: "string"
+                    instructorJoin:
+                      type: "string"
+                    learnerJoin:
+                      type: "string"
+                    oauthAccount:
+                      type: "string"
+                    duration:
+                      type: "number"
+                    url:
+                      type: "string"
+                    webinarTool:
+                      type: "string"
         correlationId:
           type: "string"
         statusCode:
@@ -2681,143 +2826,19 @@ components:
         statusCode:
           type: integer
     PassUserResponse:
-      type: object
+      type: "object"
       properties:
-        success:
-          type: boolean
-        correlationId:
-          type: string
         body:
-          type: object
+          type: "object"
           properties:
-            sessions:
-              type: array
-              items:
-                type: object
-                properties:
-                  date_begin:
-                    type: string
-                    description: "The UTC begin date of the session, in the &quot;yyyy-mm-dd hh:mm:ss&quot; format"
-                  date_end:
-                    type: string
-                    description: "The UTC end date of the session, in the &quot;yyyy-mm-dd hh:mm:ss&quot; format"
-                  dates:
-                    type: array
-                    description: A list of session dates
-                    items:
-                      type: object
-                      properties:
-                        attendance_status:
-                          type: string
-                          example: "null"
-                          description: The attendance status of the user for the session date
-                          enum:
-                            - attended
-                            - not_attended
-                        date:
-                          type: string
-                          example: "null"
-                          description: The session date
-                        id_classroom:
-                          type: integer
-                          format: int32
-                          example: "null"
-                          description: "The ID of the classroom where the course is located, for classrooms only"
-                        id_location:
-                          type: integer
-                          format: int32
-                          example: "null"
-                          description: "The ID of the location where the course is located, for classrooms only"
-                        name:
-                          type: string
-                          example: "null"
-                          description: The name of the session date
-                        time_begin:
-                          type: string
-                          example: "null"
-                          description: The starting time of the session date
-                        time_end:
-                          type: string
-                          example: "null"
-                          description: The ending time of the session date
-                        timezone:
-                          type: string
-                          example: "null"
-                          description: The timezone of the session date
-                  description:
-                    type: string
-                    description: The description of the session
-                  id:
-                    type: integer
-                    format: int32
-                    description: The id of the session
-                  max_enrollments:
-                    type: integer
-                    format: int32
-                    description: Maximum number of allowed enrollments
-                  min_enrollments:
-                    type: integer
-                    format: int32
-                    description: "Minimum number of allowed enrollments, only for classrooms"
-                  name:
-                    type: string
-                    description: The name of the session
-                  other_info:
-                    type: string
-                    description: Additional info about the course. Only for classrooms
-                  score_base:
-                    type: integer
-                    format: int32
-                    description: The base score of the course
-                  status:
-                    type: string
-                    description: The status of the user enrollment for the session
-                    enum:
-                      - not_subscribed
-                      - subscribed
-                      - in_progress
-                      - complete
-                      - waiting
-                      - subscription_to_confirm
-                      - overbooking
-                  tool:
-                    type: string
-                    description: The name of the tool used for the webinar. For webinars only.
-            code:
-              type: string
-            courseId:
-              type: integer
-            endDate:
-              type: string
-            level:
-              type: string
-            enrollmentFields:
-              type: object
-              properties:
-                Accreditation Info:
-                  type: string
-            description:
-              type: string
-            sessionId:
-              type: integer
-            type:
-              type: string
-            enrollDate:
-              type: string
-            userId:
-              type: integer
-            score:
-              type: integer
-            enrollmentURL:
-              type: string
-            enrollmentStatus:
-              type: string
-            name:
-              type: string
-            completionDate:
-              type: string
+            message:
+              type: "string"
+        correlationId:
+          type: "string"
         statusCode:
-          type: integer
+          type: "integer"
+        success:
+          type: "boolean"
     EnrollUserResponse:
       type: object
       properties:
@@ -2842,12 +2863,25 @@ components:
           items:
             type: "object"
             properties:
-              learningPlanId:
-                type: "string"
               learningPlanName:
                 type: "string"
-              learningPlanAccessLevel:
+              learningPlanCode:
                 type: "string"
+              learningPlanDescription:
+                type: "string"
+              courses:
+                type: "array"
+                items:
+                  type: "string"
+              additionalFields:
+                type: "object"
+                properties: {}
+                additionalProperties:
+                  type: "string"
+              links:
+                type: "array"
+                items:
+                  type: "string"
         correlationId:
           type: "string"
         statusCode:
@@ -2942,6 +2976,20 @@ components:
         success:
           type: "boolean"
     UpdateLearningPlanResponse:
+      type: "object"
+      properties:
+        body:
+          type: "object"
+          properties:
+            message:
+              type: "string"
+        correlationId:
+          type: "string"
+        statusCode:
+          type: "integer"
+        success:
+          type: "boolean"
+    SubscribeToLearningPlanResponse:
       type: "object"
       properties:
         body:
@@ -3055,9 +3103,9 @@ components:
                             type: "string"
                           sessionDayName:
                             type: "string"
-                          timeBegin:
+                          startHour:
                             type: "string"
-                          timeEnd:
+                          endHour:
                             type: "string"
                           breakBegin:
                             type: "string"
