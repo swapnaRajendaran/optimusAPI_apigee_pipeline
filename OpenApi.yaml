@@ -1169,12 +1169,6 @@ paths:
             type: integer
             format: int64
           required: true
-        - name: sessionId
-          in: path
-          schema:
-            type: integer
-            format: int64
-          required: true
       requestBody:
         content:
           application/json:
@@ -1221,6 +1215,12 @@ paths:
       operationId: UpdateClassroomSession
       parameters:
         - name: courseId
+          in: path
+          schema:
+            type: integer
+            format: int64
+          required: true
+        - name: sessionId
           in: path
           schema:
             type: integer
