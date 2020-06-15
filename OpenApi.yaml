@@ -22,23 +22,23 @@ x-tr-servers:
   default:
     environments:
       dev:
-        host: lmc05olut3.execute-api.us-east-1.amazonaws.com
+        host: 581xg6jdnd.execute-api.us-east-1.amazonaws.com
         port: 443
         ssl: "true"
       test:
-        host: lmc05olut3.execute-api.us-east-1.amazonaws.com
+        host: 581xg6jdnd.execute-api.us-east-1.amazonaws.com
         port: 443
         ssl: "true"
       uat:
-        host: lmc05olut3.execute-api.us-east-1.amazonaws.com
+        host: 581xg6jdnd.execute-api.us-east-1.amazonaws.com
         port: 443
         ssl: "true"
       trexternal:
-        host: bbiuc3kmz4.execute-api.us-east-1.amazonaws.com
+        host: on8ruhv182.execute-api.us-east-1.amazonaws.com
         port: 443
         ssl: "true"
    
-    basePath: /blue
+    basePath: /prod
 tags:
   - name: user
     description: LMS user
