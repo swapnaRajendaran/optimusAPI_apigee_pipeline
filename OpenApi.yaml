@@ -3240,7 +3240,7 @@ components:
       type: oauth2
       flows:
         clientCredentials:
-          tokenUrl: "https://api-dev.thomsonreuters.com/tr-oauth/v1/token"
+          tokenUrl: "https://api-prod.thomsonreuters.com/tr-oauth/v1/token"
           scopes:
             "write:lms": modify lms in your account
             "read:lms": read your lms
