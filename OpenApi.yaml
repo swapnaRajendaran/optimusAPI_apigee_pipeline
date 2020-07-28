@@ -33,7 +33,11 @@ x-tr-servers:
         host: on8ruhv182.execute-api.us-east-1.amazonaws.com
         port: 443
         ssl: "true"
-      prod:
+      sat:
+        host: on8ruhv182.execute-api.us-east-1.amazonaws.com
+        port: 443
+        ssl: "true"
+      trexternal:
         host: on8ruhv182.execute-api.us-east-1.amazonaws.com
         port: 443
         ssl: "true"
