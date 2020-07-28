@@ -22,22 +22,17 @@ x-tr-servers:
   default:
     environments:
       dev:
-        host: 581xg6jdnd.execute-api.us-east-1.amazonaws.com
-        port: 443
-        ssl: "true"
-      test:
-        host: 581xg6jdnd.execute-api.us-east-1.amazonaws.com
-        port: 443
-        ssl: "true"
-      uat:
-        host: 581xg6jdnd.execute-api.us-east-1.amazonaws.com
-        port: 443
-        ssl: "true"
-      trexternal:
         host: on8ruhv182.execute-api.us-east-1.amazonaws.com
         port: 443
         ssl: "true"
-   
+      test:
+        host: on8ruhv182.execute-api.us-east-1.amazonaws.com
+        port: 443
+        ssl: "true"
+      sat:
+        host: on8ruhv182.execute-api.us-east-1.amazonaws.com
+        port: 443
+        ssl: "true"
     basePath: /prod
 tags:
   - name: user
@@ -56,7 +51,7 @@ tags:
     description: LMS sessions
   - name: additionalFields
     description: LMS additionalFields
-  - name: learningplan
+  - name: learningplans
     description: LMS learning plans
 paths:
   /users:
@@ -535,7 +530,7 @@ paths:
         - OAuth2:
             - "write:lms"
             - "read:lms"
-  "/courses/learningPlan/{learningPlanId}":
+  "/courses/learningPlans/{learningPlanId}":
     get:
       tags:
         - course
@@ -1103,7 +1098,7 @@ paths:
       tags:
         - sessions
       summary: Updates a webinar session for a particular course
-      description: Updates a webinar session for a given course id
+      description: Updates a webinar session for a given course id, session id and code
       operationId: UpdateWebinarSession
       parameters:
         - name: courseId
@@ -1211,7 +1206,7 @@ paths:
       tags:
         - sessions
       summary: Updates a classroom session for a particular course
-      description: Updates a classroom session for a given course id
+      description: Updates a classroom session for a given course id, session id, code
       operationId: UpdateClassroomSession
       parameters:
         - name: courseId
@@ -1263,10 +1258,10 @@ paths:
         - OAuth2:
             - "write:lms"
             - "read:lms"
-  /learningPlan:
+  /learningPlans:
     get:
       tags:
-        - learningplan
+        - learningplans
       summary: Finds the list of learning plans
       description: Fetches the list of learning plans for which the logged in User has access
       operationId: GetLearningPlanList
@@ -1304,10 +1299,10 @@ paths:
         - OAuth2:
             - "write:lms"
             - "read:lms"
-  "/learningPlan/{learningPlanId}":
+  "/learningPlans/{learningPlanId}":
     get:
       tags:
-        - learningplan
+        - learningplans
       summary: Get learning plan by learning plan id
       description: Fetch learning plan based on learning plan id provided
       operationId: GetLearningPlan
@@ -1352,7 +1347,7 @@ paths:
             - "read:lms"
     delete:
       tags:
-        - learningplan
+        - learningplans
       summary: Deletes a learning plan based on the learning plan id
       description: Deletes a learning plan by the learning plan id
       operationId: DeleteLearningPlan
@@ -1396,10 +1391,10 @@ paths:
         - OAuth2:
             - "write:lms"
             - "read:lms"
-  "/learningPlan/enroll":
+  "/learningPlans/enroll":
     post:
       tags:
-        - learningplan
+        - learningplans
       summary: Subscribe to a learning plan
       description: Subscribe to a learning plan
       operationId: SubscribeToLearningPlan
@@ -1557,12 +1552,6 @@ components:
                 type: "number"
             required:
               - "id"
-        irsptin:
-          type: "string"
-        ctech:
-          type: "string"
-        cfp:
-          type: "string"
         timezone:
           type: "string"
         level:
@@ -1606,12 +1595,6 @@ components:
                 type: "number"
             required:
               - "id"
-        irsptin:
-          type: "string"
-        ctech:
-          type: "string"
-        cfp:
-          type: "string"
         timezone:
           type: "string"
         level:
@@ -1659,8 +1642,10 @@ components:
           type: "number"
         maxSubscriptionQuota:
           type: "number"
-        waitingList:
-          type: "number"
+        allowOverbooking:
+          type: "boolean"
+        allowAutomaticallyEnroll:
+          type: "boolean"
         demoMaterial:
           type: "string"
         courseSubscription:
@@ -1677,13 +1662,6 @@ components:
           type: "number"
         courseAutoPlay:
           type: "number"
-        prerequisitesList:
-          type: "string"
-          description: "Navigation policy: either 1 (Free Learning path), 2 (Sequential Learning path), 3 (Final Test) or 4 (Pre Test). 2,3 and 4 are allowed only for elearning courses, while 1 or no parameter at all is allowed also for classroom and webinar"
-        advancedPreparations:
-          type: "string"
-        targetAudience:
-          type: "string"
         majorTopics:
           type: "string"
         level:
@@ -1700,6 +1678,10 @@ components:
           type: "boolean"
         isPublished:
           type: "boolean"
+        additionalFields:
+          type: "object"
+          additionalProperties:
+            type: "string"
       required:
         - "catalogIds"
         - "courseType"
@@ -1739,8 +1721,10 @@ components:
           type: "number"
         maxSubscriptionQuota:
           type: "number"
-        waitingList:
-          type: "number"
+        allowOverbooking:
+          type: "boolean"
+        allowAutomaticallyEnroll:
+          type: "boolean"
         demoMaterial:
           type: "string"
         courseSubscription:
@@ -1757,13 +1741,6 @@ components:
           type: "number"
         courseAutoPlay:
           type: "number"
-        prerequisitesList:
-          type: "string"
-          description: "Navigation policy: either 1 (Free Learning path), 2 (Sequential Learning path), 3 (Final Test) or 4 (Pre Test). 2,3 and 4 are allowed only for elearning courses, while 1 or no parameter at all is allowed also for classroom and webinar"
-        advancedPreparations:
-          type: "string"
-        targetAudience:
-          type: "string"
         majorTopics:
           type: "string"
         level:
@@ -1780,6 +1757,10 @@ components:
           type: "boolean"
         isPublished:
           type: "boolean"
+        additionalFields:
+          type: "object"
+          additionalProperties:
+            type: "string"
     CourseMultipartPost:
       type: object
       properties:
@@ -1908,8 +1889,6 @@ components:
           type: "string"
         maximumEnrollments:
           type: "number"
-        minimumEnrollments:
-          type: "number"
         completion:
           type: "string"
         dates:
@@ -1941,8 +1920,10 @@ components:
                 type: "number"
               instructorJoin:
                 type: "string"
+                description: "Instructor join time in minutes in a day. Must be between 0 and 1425 and must be a multiple of 15"
               learnerJoin:
                 type: "string"
+                description: "Learner join time in minutes in a day. Must be between 0 and 1425 and must be a multiple of 15"
               webinarTool:
                 type: "string"
               url:
@@ -2036,8 +2017,6 @@ components:
           type: "number"
         learningPlanId:
           type: "number"
-        waiting:
-          type: "boolean"
       required:
         - "userId"
         - "learningPlanId"
@@ -3253,7 +3232,7 @@ components:
       type: oauth2
       flows:
         clientCredentials:
-          tokenUrl: "https://api-prod.thomsonreuters.com/tr-oauth/v1/token"
+          tokenUrl: "https://api-dev.thomsonreuters.com/tr-oauth/v1/token"
           scopes:
             "write:lms": modify lms in your account
             "read:lms": read your lms
